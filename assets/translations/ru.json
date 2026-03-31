@@ -1,0 +1,53 @@
+{
+  "appName": "Evim Furniture",
+  "appTagline": "Ваш дом, ваш стиль",
+
+  "chooseLanguageTitle": "Выберите язык",
+  "chooseLanguageDesc": "Выберите предпочитаемый язык для\nудобного использования Evim Furniture",
+  "selectLanguage": "Выберите язык",
+
+  "langUzbek": "O'zbek",
+  "langEnglish": "English",
+  "langRussian": "Русский",
+
+  "categoriesTitle": "Категории",
+  "seeAll": "Смотреть все",
+  "topFurnitures": "Топ мебель",
+  "topCombinations": "Топ комбинации",
+  "materialsCount": "{count} материала",
+  "materialsTitle": "Материалы",
+
+  "intro1Title": "Тысячи мебельных\nколлекций",
+  "intro1Subtitle": "От уютных диванов до элегантных спальных гарнитуров — для каждой комнаты и стиля.",
+  "intro2Title": "Изучайте материалы\nи стили",
+  "intro2Subtitle": "Фильтруйте по массиву дуба, бархату или ротангу. Найдите отделку для дома.",
+  "intro3Title": "Смотрите дома\nчерез AR",
+  "intro3Subtitle": "Направьте камеру на комнату и мгновенно разместите мебель в натуральную величину.",
+
+  "btnNext": "Далее",
+  "btnSkip": "Пропустить",
+  "btnGetStarted": "Начать",
+  "btnContinue": "Продолжить",
+
+  "navHome": "Главная",
+  "navSearch": "Поиск",
+  "navFavorites": "Избранное",
+  "navProfile": "Профиль",
+
+  "welcome_to": "Добро пожаловать в {}",
+  "need_login_to_continue": "Войдите, чтобы продолжить",
+  "login": "Войти",
+
+  "settings": "Настройки",
+  "info": "Информация",
+
+  "language": "Язык",
+  "theme": "Тема",
+  "theme_dark": "Тёмная",
+  "theme_light": "Светлая",
+
+  "help": "Помощь",
+  "rate_us": "Оценить приложение",
+  "contact_support": "Связаться с поддержкой",
+  "legal_info": "Правовая информация"
+}

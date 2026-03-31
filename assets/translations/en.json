@@ -1,0 +1,53 @@
+{
+  "appName": "Evim Furniture",
+  "appTagline": "Your home, your style",
+
+  "chooseLanguageTitle": "Choose your language",
+  "chooseLanguageDesc": "Select your preferred language to use\nEvim Furniture easily",
+  "selectLanguage": "Select language",
+
+  "langUzbek": "O'zbek",
+  "langEnglish": "English",
+  "langRussian": "Русский",
+
+  "categoriesTitle": "Categories",
+  "seeAll": "See all",
+  "topFurnitures": "Top Furnitures",
+  "topCombinations": "Top Combinations",
+  "materialsCount": "{count} materials",
+  "materialsTitle": "Materials",
+
+  "intro1Title": "Thousands of furniture\ncollections",
+  "intro1Subtitle": "From cozy sofas to elegant bedroom sets — explore a handpicked catalog for every room and style.",
+  "intro2Title": "Explore materials\n& styles",
+  "intro2Subtitle": "Filter by solid oak, soft velvet, brushed metal or natural rattan. Find the finish that feels like home.",
+  "intro3Title": "See it in your\nhome with AR",
+  "intro3Subtitle": "Point your camera at any room and place true-to-scale 3D furniture instantly.",
+
+  "btnNext": "Next",
+  "btnSkip": "Skip",
+  "btnGetStarted": "Get Started",
+  "btnContinue": "Continue",
+
+  "navHome": "Home",
+  "navSearch": "Search",
+  "navFavorites": "Favorites",
+  "navProfile": "Profile",
+
+  "welcome_to": "Welcome to {}",
+  "need_login_to_continue": "Sign in to continue",
+  "login": "Sign In",
+
+  "settings": "Settings",
+  "info": "Information",
+
+  "language": "Language",
+  "theme": "Theme",
+  "theme_dark": "Dark",
+  "theme_light": "Light",
+
+  "help": "Help",
+  "rate_us": "Rate Us",
+  "contact_support": "Contact Support",
+  "legal_info": "Legal Information"
+}

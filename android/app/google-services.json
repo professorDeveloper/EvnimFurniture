@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "140320585865",
+    "project_id": "evimfurn",
+    "storage_bucket": "evimfurn.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140320585865:android:627f8433e856e46ebcae58",
+        "android_client_info": {
+          "package_name": "com.saikou.evim_furniture"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7ypowuDWtfzkOEUso1Kpdhk18KuOukzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
