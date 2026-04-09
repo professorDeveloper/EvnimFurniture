@@ -4,17 +4,20 @@ class DioClient {
   DioClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://harold-lobby-flood-liable.trycloudflare.com/',
+        baseUrl: 'https://tapes-caps-xhtml-crop.trycloudflare.com/',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
+        contentType: 'application/json',
         headers: {'accept': 'application/json'},
       ),
     );
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      logPrint: (o) => print(o),
-    ));
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        logPrint: (o) => print(o),
+      ),
+    );
   }
 
   late final Dio _dio;

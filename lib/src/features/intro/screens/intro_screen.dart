@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:evim_furniture/src/core/constants/app_texts.dart';
 import 'package:evim_furniture/src/core/router/pages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -44,13 +45,20 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
 
   void _next() {
     if (_isLast) {
-      Navigator.of(context).pushNamedAndRemoveUntil(Pages.home, (_) => false);
+      _completeOnboarding();
       return;
     }
     _controller.nextPage(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
+  }
+
+  Future<void> _completeOnboarding() async {
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'onboarding_done', value: 'true');
+    if (!mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil(Pages.home, (_) => false);
   }
 
   void _back() {

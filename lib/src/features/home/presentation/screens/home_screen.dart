@@ -59,7 +59,13 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
       elevation: 0,
       scrolledUnderElevation: 0,
-      title: SvgPicture.asset(AppIcons.appbarIcon, height: 33),
+      title: SvgPicture.asset(
+        AppIcons.appbarIcon,
+        height: 33,
+        colorFilter: isDark
+            ? const ColorFilter.mode(AppColors.white, BlendMode.srcIn)
+            : null,
+      ),
       centerTitle: true,
       actions: [
         Padding(

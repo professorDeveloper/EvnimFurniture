@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../../../home/presentation/screens/home_screen.dart';
 import '../../../../core/constants/app_icons.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/router/pages.dart';
 import '../../../../core/theme/theme_controller.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -258,7 +258,9 @@ class _ProfileBody extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(14),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, Pages.login);
+                    },
                     child: Center(
                       child: Text(
                         'login'.tr(),
