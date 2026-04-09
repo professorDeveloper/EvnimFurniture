@@ -37,7 +37,7 @@ abstract class AuthRepository {
     required String userType,
     String? picturePath,
   });
-  Future<UserModel> editProfile({String? name, String? picturePath});
+  Future<UserModel> editProfile({String? name, String? picturePath, String? userType});
 
   // User
   Future<UserModel> getMe();

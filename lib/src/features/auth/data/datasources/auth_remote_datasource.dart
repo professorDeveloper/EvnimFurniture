@@ -27,7 +27,7 @@ abstract class AuthRemoteDataSource {
     required String userType,
     String? picturePath,
   });
-  Future<UserModel> editProfile({String? name, String? picturePath});
+  Future<UserModel> editProfile({String? name, String? picturePath, String? userType});
 
   // Social login
   Future<LoginResponse> socialLogin();
@@ -117,9 +117,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> editProfile({String? name, String? picturePath}) async {
+  Future<UserModel> editProfile({String? name, String? picturePath, String? userType}) async {
     final map = <String, dynamic>{};
     if (name != null) map['name'] = name;
+    if (userType != null) map['userType'] = userType;
     if (picturePath != null) {
       map['picture'] = await MultipartFile.fromFile(picturePath);
     }

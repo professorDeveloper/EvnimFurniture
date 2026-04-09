@@ -16,9 +16,11 @@ class VerifyOtpUseCase {
 
     await _repository.saveIdToken(idToken);
 
-    // Register FCM token
-    NotificationService.instance.registerToken();
-    NotificationService.instance.listenTokenRefresh();
+    // Register FCM token if permission already granted
+    if (NotificationService.instance.isPermissionGranted) {
+      NotificationService.instance.registerToken();
+      NotificationService.instance.listenTokenRefresh();
+    }
 
     return response.isNewUser;
   }

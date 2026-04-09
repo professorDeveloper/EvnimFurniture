@@ -17,8 +17,10 @@ class VerifyEmailOtpUseCase {
 
     await _repository.saveIdToken(idToken);
 
-    NotificationService.instance.registerToken();
-    NotificationService.instance.listenTokenRefresh();
+    if (NotificationService.instance.isPermissionGranted) {
+      NotificationService.instance.registerToken();
+      NotificationService.instance.listenTokenRefresh();
+    }
 
     return response.isNewUser;
   }

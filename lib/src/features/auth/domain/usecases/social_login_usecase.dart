@@ -23,9 +23,11 @@ class SocialLoginUseCase {
     // 4. Call backend POST /api/auth/login with Bearer token
     final response = await _repository.socialLogin();
 
-    // 5. Register FCM token
-    NotificationService.instance.registerToken();
-    NotificationService.instance.listenTokenRefresh();
+    // 5. Register FCM token if permission already granted
+    if (NotificationService.instance.isPermissionGranted) {
+      NotificationService.instance.registerToken();
+      NotificationService.instance.listenTokenRefresh();
+    }
 
     return response;
   }

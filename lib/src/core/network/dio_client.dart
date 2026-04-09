@@ -5,7 +5,7 @@ class DioClient {
   DioClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://cluster-corps-exceed-lists.trycloudflare.com/',
+        baseUrl: 'https://accessible-image-pig-championship.trycloudflare.com/',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         contentType: 'application/json',

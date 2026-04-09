@@ -201,6 +201,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _editProfileUseCase(
         name: event.name,
         picturePath: event.picturePath,
+        userType: event.userType,
       );
       emit(ProfileSaved(user: user));
     } catch (e) {

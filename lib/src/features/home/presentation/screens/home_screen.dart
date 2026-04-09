@@ -1,4 +1,5 @@
 import 'package:evim_furniture/src/core/constants/app_colors.dart';
+import 'package:evim_furniture/src/core/services/notification_service.dart';
 import 'package:evim_furniture/src/core/constants/app_icons.dart';
 import 'package:evim_furniture/src/core/di/injection.dart';
 import 'package:evim_furniture/src/features/home/domain/model/home_data.dart';
@@ -79,8 +80,15 @@ class HomeScreen extends StatelessWidget {
                   color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                   size: 24,
                 ),
-                onPressed: () => Navigator.pushNamed(
-                    context, '/notifications'),
+                onPressed: () async {
+                  // Request permission on first tap (in-context)
+                  if (!NotificationService.instance.isPermissionGranted) {
+                    await NotificationService.instance.requestPermission();
+                  }
+                  if (context.mounted) {
+                    Navigator.pushNamed(context, '/notifications');
+                  }
+                },
               ),
               Positioned(
                 top: 10,

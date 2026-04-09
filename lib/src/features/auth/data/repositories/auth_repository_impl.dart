@@ -118,8 +118,8 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
   @override
-  Future<UserModel> editProfile({String? name, String? picturePath}) =>
-      remoteDataSource.editProfile(name: name, picturePath: picturePath);
+  Future<UserModel> editProfile({String? name, String? picturePath, String? userType}) =>
+      remoteDataSource.editProfile(name: name, picturePath: picturePath, userType: userType);
 
   // User
   @override

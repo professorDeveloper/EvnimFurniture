@@ -57,9 +57,10 @@ class CompleteProfileEvent extends AuthEvent {
 }
 
 class EditProfileEvent extends AuthEvent {
-  const EditProfileEvent({this.name, this.picturePath});
+  const EditProfileEvent({this.name, this.picturePath, this.userType});
   final String? name;
   final String? picturePath;
+  final String? userType;
 }
 
 class LogoutEvent extends AuthEvent {

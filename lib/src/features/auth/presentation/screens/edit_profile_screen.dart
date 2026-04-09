@@ -30,12 +30,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   String? _newAvatarPath;
   bool _nameError = false;
+  late String? _selectedType;
+
+  static const _typeOptions = ['mijoz', 'sotuvchi', 'boshqa'];
 
   @override
   void initState() {
     super.initState();
     _authBloc = sl<AuthBloc>();
     _nameController.text = widget.user.name ?? '';
+    final ut = widget.user.userType;
+    _selectedType = _typeOptions.contains(ut) ? ut : 'mijoz';
   }
 
   @override
@@ -47,8 +52,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   bool get _hasChanges {
-    final nameChanged = _nameController.text.trim() != (widget.user.name ?? '');
-    return nameChanged || _newAvatarPath != null;
+    final nameChanged =
+        _nameController.text.trim() != (widget.user.name ?? '');
+    final typeChanged = _selectedType != widget.user.userType;
+    return nameChanged || _newAvatarPath != null || typeChanged;
   }
 
   void _onSave() {
@@ -60,9 +67,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     final nameChanged = name != (widget.user.name ?? '');
+    final typeChanged = _selectedType != widget.user.userType;
+
     _authBloc.add(EditProfileEvent(
       name: nameChanged ? name : null,
       picturePath: _newAvatarPath,
+      userType: typeChanged ? _selectedType : null,
     ));
   }
 
@@ -185,7 +195,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           fit: BoxFit.cover,
         ),
       );
-    } else if (widget.user.picture != null && widget.user.picture!.isNotEmpty) {
+    } else if (widget.user.picture != null &&
+        widget.user.picture!.isNotEmpty) {
       imageWidget = ClipOval(
         child: CachedNetworkImage(
           imageUrl: widget.user.picture!,
@@ -221,7 +232,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             height: 90,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
+              color:
+                  isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
               border: Border.all(
                 color: isDark ? AppColors.darkDivider : AppColors.grey200,
                 width: 1.5,
@@ -255,6 +267,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  IconData _typeIcon(String type) {
+    switch (type) {
+      case 'mijoz':
+        return Icons.person_rounded;
+      case 'sotuvchi':
+        return Icons.store_rounded;
+      default:
+        return Icons.more_horiz_rounded;
+    }
+  }
+
+  String _typeLabel(String type) {
+    switch (type) {
+      case 'mijoz':
+        return AppTexts.authTypeMijoz.tr();
+      case 'sotuvchi':
+        return AppTexts.authTypeDiller.tr();
+      default:
+        return AppTexts.authTypeBoshqa.tr();
+    }
+  }
+
+  String _typeDesc(String type) {
+    switch (type) {
+      case 'mijoz':
+        return AppTexts.authTypeMijozDesc.tr();
+      case 'sotuvchi':
+        return AppTexts.authTypeDillerDesc.tr();
+      default:
+        return AppTexts.authTypeBoshqaDesc.tr();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -278,6 +323,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            surfaceTintColor: Colors.transparent,
             elevation: 0,
             scrolledUnderElevation: 0,
             leading: IconButton(
@@ -331,7 +377,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       textCapitalization: TextCapitalization.words,
                       onChanged: (_) {
                         if (_nameError) setState(() => _nameError = false);
-                        setState(() {}); // rebuild for hasChanges
+                        setState(() {});
                       },
                       style: GoogleFonts.dmSans(fontSize: 14),
                       decoration: InputDecoration(
@@ -373,6 +419,132 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         errorStyle: GoogleFonts.dmSans(fontSize: 11),
                       ),
                     ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // User type
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      AppTexts.authUserTypeLabel.tr(),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  IntrinsicHeight(
+                    child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: _typeOptions.map((type) {
+                      final selected = _selectedType == type;
+                      final accentColor = isDark
+                          ? AppColors.secondary200
+                          : AppColors.secondary;
+                      final bgColor = selected
+                          ? (isDark
+                              ? AppColors.secondary600.withOpacity(0.25)
+                              : AppColors.secondary50)
+                          : (isDark
+                              ? AppColors.darkSurfaceVariant
+                              : AppColors.grey50);
+                      final borderColor = selected
+                          ? accentColor
+                          : (isDark
+                              ? AppColors.darkDivider
+                              : AppColors.grey200);
+
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            left: type == _typeOptions.first ? 0 : 4,
+                            right: type == _typeOptions.last ? 0 : 4,
+                          ),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
+                            decoration: BoxDecoration(
+                              color: bgColor,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: borderColor,
+                                width: selected ? 2 : 1.5,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(14),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () =>
+                                    setState(() => _selectedType = type),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 14),
+                                  child: Column(
+                                    children: [
+                                      AnimatedContainer(
+                                        duration: const Duration(
+                                            milliseconds: 200),
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: selected
+                                              ? accentColor
+                                                  .withOpacity(0.15)
+                                              : (isDark
+                                                  ? AppColors.darkSurface
+                                                  : AppColors.grey100),
+                                        ),
+                                        child: Icon(
+                                          _typeIcon(type),
+                                          size: 17,
+                                          color: selected
+                                              ? accentColor
+                                              : cs.onSurfaceVariant
+                                                  .withOpacity(0.6),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        _typeLabel(type),
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: selected
+                                              ? accentColor
+                                              : cs.onSurface,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        _typeDesc(type),
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: 9,
+                                          color: cs.onSurfaceVariant
+                                              .withOpacity(0.7),
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                   ),
 
                   const SizedBox(height: 32),
@@ -419,6 +591,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       );
                     },
                   ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
