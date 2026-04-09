@@ -8,14 +8,15 @@ class AuthInitial extends AuthState {
   const AuthInitial();
 }
 
-// Send OTP states
+// Send OTP states (phone & email)
 class OtpSending extends AuthState {
   const OtpSending();
 }
 
 class OtpSent extends AuthState {
-  const OtpSent({required this.phone, required this.message});
-  final String phone;
+  const OtpSent({this.phone, this.email, required this.message});
+  final String? phone;
+  final String? email;
   final String message;
 }
 
@@ -52,4 +53,57 @@ class OtpResent extends AuthState {
 class OtpResendError extends AuthState {
   const OtpResendError({required this.message});
   final String message;
+}
+
+// Social login states
+class SocialLoginLoading extends AuthState {
+  const SocialLoginLoading();
+}
+
+class SocialLoginSuccess extends AuthState {
+  const SocialLoginSuccess({
+    required this.isNewUser,
+    required this.user,
+  });
+  final bool isNewUser;
+  final UserModel user;
+}
+
+class SocialLoginError extends AuthState {
+  const SocialLoginError({required this.message});
+  final String message;
+}
+
+// User states
+class UserLoading extends AuthState {
+  const UserLoading();
+}
+
+class UserLoaded extends AuthState {
+  const UserLoaded({required this.user});
+  final UserModel user;
+}
+
+class UserError extends AuthState {
+  const UserError({required this.message});
+  final String message;
+}
+
+// Profile completion/edit
+class ProfileSaving extends AuthState {
+  const ProfileSaving();
+}
+
+class ProfileSaved extends AuthState {
+  const ProfileSaved({required this.user});
+  final UserModel user;
+}
+
+class ProfileSaveError extends AuthState {
+  const ProfileSaveError({required this.message});
+  final String message;
+}
+
+class LoggedOut extends AuthState {
+  const LoggedOut();
 }

@@ -79,7 +79,8 @@ class HomeScreen extends StatelessWidget {
                   color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                   size: 24,
                 ),
-                onPressed: () {},
+                onPressed: () => Navigator.pushNamed(
+                    context, '/notifications'),
               ),
               Positioned(
                 top: 10,
@@ -127,26 +128,35 @@ class _HomeBody extends StatelessWidget {
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          const SliverToBoxAdapter(child: SizedBox(height: 12)),
-          SliverToBoxAdapter(child: StoriesList(items: data.stories)),
+          if (data.stories.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            SliverToBoxAdapter(child: StoriesList(items: data.stories)),
+          ],
           const SliverToBoxAdapter(child: SizedBox(height: 12)),
           SliverToBoxAdapter(
             child: BannerCarousel(banners: banners, isDark: isDark),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          SliverToBoxAdapter(child: CategoryList(items: data.categories)),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          SliverToBoxAdapter(
-              child: TopFurnituresSection(
-                items: data.topFurniture,
-                materials: data.topMaterials,
-              )),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          SliverToBoxAdapter(child: MaterialsSection(items: data.topMaterials)),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          if (data.topCombinations.isNotEmpty)
+          if (data.categories.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(child: CategoryList(items: data.categories)),
+          ],
+          if (data.topFurniture.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(
+                child: TopFurnituresSection(
+                  items: data.topFurniture,
+                  materials: data.topMaterials,
+                )),
+          ],
+          if (data.topMaterials.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(child: MaterialsSection(items: data.topMaterials)),
+          ],
+          if (data.topCombinations.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
             SliverToBoxAdapter(
                 child: TopCombinationsSection(items: data.topCombinations)),
+          ],
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       ),

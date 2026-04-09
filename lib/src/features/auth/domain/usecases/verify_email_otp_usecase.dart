@@ -1,14 +1,15 @@
 import '../../../../core/services/notification_service.dart';
 import '../repositories/auth_repository.dart';
 
-class VerifyOtpUseCase {
-  const VerifyOtpUseCase(this._repository);
+class VerifyEmailOtpUseCase {
+  const VerifyEmailOtpUseCase(this._repository);
   final AuthRepository _repository;
 
-  /// Verifies OTP, signs in with Firebase custom token,
-  /// saves idToken, registers FCM, and returns whether user is new.
-  Future<bool> call({required String phone, required String code}) async {
-    final response = await _repository.verifyOtp(phone: phone, code: code);
+  Future<bool> call({required String email, required String code}) async {
+    final response = await _repository.verifyEmailOtp(
+      email: email,
+      code: code,
+    );
 
     final idToken = await _repository.signInWithCustomToken(
       response.customToken,
@@ -16,7 +17,6 @@ class VerifyOtpUseCase {
 
     await _repository.saveIdToken(idToken);
 
-    // Register FCM token
     NotificationService.instance.registerToken();
     NotificationService.instance.listenTokenRefresh();
 

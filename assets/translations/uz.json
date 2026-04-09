@@ -88,5 +88,13 @@
   "authPickPhoto": "Rasm tanlash",
   "authPickCamera": "Kamera",
   "authPickGallery": "Galereya",
-  "authPickRemove": "Rasmni o'chirish"
+  "authPickRemove": "Rasmni o'chirish",
+  "logout": "Chiqish",
+  "logoutConfirm": "Rostdan ham chiqmoqchimisiz?",
+  "logoutConfirmDesc": "Hisobingizdan chiqasiz. Qayta kirish uchun telefon yoki email orqali tasdiqlash kerak bo'ladi.",
+  "cancel": "Bekor qilish",
+  "editProfile": "Profilni tahrirlash",
+  "save": "Saqlash",
+  "notifications": "Bildirishnomalar",
+  "noNotifications": "Bildirishnomalar yo'q"
 }

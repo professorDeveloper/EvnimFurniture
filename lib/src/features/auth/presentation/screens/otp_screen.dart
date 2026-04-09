@@ -117,7 +117,11 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _verifyCode(String code) {
-    _authBloc.add(VerifyOtpEvent(phone: widget.destination, code: code));
+    if (_isPhone) {
+      _authBloc.add(VerifyOtpEvent(phone: widget.destination, code: code));
+    } else {
+      _authBloc.add(VerifyEmailOtpEvent(email: widget.destination, code: code));
+    }
   }
 
   String get _maskedDestination {

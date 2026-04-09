@@ -1,0 +1,32 @@
+import '../../../../core/services/notification_service.dart';
+import '../model/login_response.dart';
+import '../repositories/auth_repository.dart';
+
+class SocialLoginUseCase {
+  const SocialLoginUseCase(this._repository);
+  final AuthRepository _repository;
+
+  /// Signs in with Google/Apple via Firebase, gets idToken,
+  /// saves it, then calls POST /api/auth/login.
+  Future<LoginResponse> call({required String provider}) async {
+    // 1. Firebase sign-in
+    final userCred = provider == 'apple'
+        ? await _repository.signInWithApple()
+        : await _repository.signInWithGoogle();
+
+    // 2. Get idToken from Firebase
+    final idToken = await userCred.user!.getIdToken();
+
+    // 3. Save idToken to secure storage (so interceptor picks it up)
+    await _repository.saveIdToken(idToken!);
+
+    // 4. Call backend POST /api/auth/login with Bearer token
+    final response = await _repository.socialLogin();
+
+    // 5. Register FCM token
+    NotificationService.instance.registerToken();
+    NotificationService.instance.listenTokenRefresh();
+
+    return response;
+  }
+}

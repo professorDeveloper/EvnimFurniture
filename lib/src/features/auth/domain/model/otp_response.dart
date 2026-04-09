@@ -2,19 +2,22 @@ class SendOtpResponse {
   const SendOtpResponse({
     required this.success,
     required this.message,
-    required this.phone,
+    this.phone,
+    this.email,
   });
 
   final bool success;
   final String message;
-  final String phone;
+  final String? phone;
+  final String? email;
 
   factory SendOtpResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>? ?? {};
     return SendOtpResponse(
       success: json['success'] as bool? ?? false,
       message: json['message'] as String? ?? '',
-      phone: data['phone'] as String? ?? '',
+      phone: data['phone'] as String?,
+      email: data['email'] as String?,
     );
   }
 }

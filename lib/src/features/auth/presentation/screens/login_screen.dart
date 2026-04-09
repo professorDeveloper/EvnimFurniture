@@ -74,11 +74,11 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _onContinueGoogle() {
-    Navigator.pushNamed(context, Pages.completeProfile);
+    _authBloc.add(const SocialLoginEvent(provider: 'google'));
   }
 
   void _onContinueApple() {
-    Navigator.pushNamed(context, Pages.completeProfile);
+    _authBloc.add(const SocialLoginEvent(provider: 'apple'));
   }
 
   void _onContinueEmail() {
@@ -156,11 +156,7 @@ class _LoginScreenState extends State<LoginScreen>
                       final email = emailController.text.trim();
                       if (email.contains('@') && email.contains('.')) {
                         Navigator.pop(ctx);
-                        Navigator.pushNamed(
-                          context,
-                          Pages.otp,
-                          arguments: {'type': 'email', 'destination': email},
-                        );
+                        _authBloc.add(SendEmailOtpEvent(email: email));
                       }
                     },
                     child: Text(AppTexts.btnContinue.tr()),
@@ -182,21 +178,41 @@ class _LoginScreenState extends State<LoginScreen>
     final cs = Theme.of(context).colorScheme;
     final size = MediaQuery.sizeOf(context);
     final isIOS = Platform.isIOS;
+    final isSmall = size.height < 700;
 
     return BlocProvider.value(
       value: _authBloc,
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is OtpSent) {
+            final isEmail = state.email != null;
             Navigator.pushNamed(
               context,
               Pages.otp,
               arguments: {
-                'type': 'phone',
-                'destination': _fullPhone,
+                'type': isEmail ? 'email' : 'phone',
+                'destination': isEmail ? state.email! : _fullPhone,
               },
             );
           } else if (state is OtpSendError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: cs.error,
+              ),
+            );
+          } else if (state is SocialLoginSuccess) {
+            if (state.isNewUser && !state.user.profileCompleted) {
+              Navigator.pushNamed(context, Pages.completeProfile,
+                  arguments: state.user.name);
+            } else {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                Pages.home,
+                (_) => false,
+              );
+            }
+          } else if (state is SocialLoginError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -227,40 +243,40 @@ class _LoginScreenState extends State<LoginScreen>
                               tag: 'app_logo',
                               child: SvgPicture.asset(
                                 AppIcons.appIcon,
-                                width: size.width * 0.4,
-                                height: size.width * 0.4,
+                                width: size.width * (isSmall ? 0.28 : 0.4),
+                                height: size.width * (isSmall ? 0.28 : 0.4),
                                 colorFilter: isDark
                                     ? const ColorFilter.mode(
                                         AppColors.white, BlendMode.srcIn)
                                     : null,
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            SizedBox(height: isSmall ? 16 : 24),
 
                             // Title
                             Text(
                               AppTexts.authLoginTitle.tr(),
                               textAlign: TextAlign.center,
                               style: GoogleFonts.dmSans(
-                                fontSize: 24,
+                                fontSize: isSmall ? 20 : 24,
                                 fontWeight: FontWeight.w800,
                                 color:
                                     isDark ? AppColors.white : cs.secondary,
                                 letterSpacing: -0.4,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: isSmall ? 4 : 8),
                             Text(
                               AppTexts.authLoginSubtitle.tr(),
                               textAlign: TextAlign.center,
                               style: GoogleFonts.dmSans(
-                                fontSize: 14,
+                                fontSize: isSmall ? 12 : 14,
                                 color: cs.onSurfaceVariant,
                                 height: 1.5,
                               ),
                             ),
 
-                            const SizedBox(height: 32),
+                            SizedBox(height: isSmall ? 20 : 32),
 
                             // Phone input
                             Container(
@@ -409,7 +425,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: isSmall ? 16 : 32),
 
                       // Bottom section: social buttons
                       Expanded(
@@ -443,35 +459,61 @@ class _LoginScreenState extends State<LoginScreen>
 
                             const SizedBox(height: 16),
 
-                            if (isIOS) ...[
-                              _SocialButton(
-                                onTap: _onContinueApple,
-                                svgPath: AppIcons.apple,
-                                label: AppTexts.authContinueApple.tr(),
-                                isDark: isDark,
-                              ),
-                              const SizedBox(height: 8),
-                              _SocialButton(
-                                onTap: _onContinueEmail,
-                                icon: Icons.email_outlined,
-                                label: AppTexts.authContinueEmail.tr(),
-                                isDark: isDark,
-                              ),
-                            ] else ...[
-                              _SocialButton(
-                                onTap: _onContinueGoogle,
-                                svgPath: AppIcons.google,
-                                label: AppTexts.authContinueGoogle.tr(),
-                                isDark: isDark,
-                              ),
-                              const SizedBox(height: 8),
-                              _SocialButton(
-                                onTap: _onContinueEmail,
-                                icon: Icons.email_outlined,
-                                label: AppTexts.authContinueEmail.tr(),
-                                isDark: isDark,
-                              ),
-                            ],
+                            BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                                final isSocialLoading =
+                                    state is SocialLoginLoading;
+                                if (isSocialLoading) {
+                                  return const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 20),
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2.5),
+                                    ),
+                                  );
+                                }
+                                return Column(
+                                  children: [
+                                    if (isIOS) ...[
+                                      _SocialButton(
+                                        onTap: _onContinueApple,
+                                        svgPath: AppIcons.apple,
+                                        label:
+                                            AppTexts.authContinueApple.tr(),
+                                        isDark: isDark,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _SocialButton(
+                                        onTap: _onContinueEmail,
+                                        icon: Icons.email_outlined,
+                                        label:
+                                            AppTexts.authContinueEmail.tr(),
+                                        isDark: isDark,
+                                      ),
+                                    ] else ...[
+                                      _SocialButton(
+                                        onTap: _onContinueGoogle,
+                                        svgPath: AppIcons.google,
+                                        label:
+                                            AppTexts.authContinueGoogle.tr(),
+                                        isDark: isDark,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _SocialButton(
+                                        onTap: _onContinueEmail,
+                                        icon: Icons.email_outlined,
+                                        label:
+                                            AppTexts.authContinueEmail.tr(),
+                                        isDark: isDark,
+                                      ),
+                                    ],
+                                  ],
+                                );
+                              },
+                            ),
 
                             const SizedBox(height: 14),
 

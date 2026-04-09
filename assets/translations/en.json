@@ -88,5 +88,13 @@
   "authPickPhoto": "Choose photo",
   "authPickCamera": "Camera",
   "authPickGallery": "Gallery",
-  "authPickRemove": "Remove photo"
+  "authPickRemove": "Remove photo",
+  "logout": "Log out",
+  "logoutConfirm": "Are you sure you want to log out?",
+  "logoutConfirmDesc": "You will be signed out. To sign in again, you'll need to verify via phone or email.",
+  "cancel": "Cancel",
+  "editProfile": "Edit profile",
+  "save": "Save",
+  "notifications": "Notifications",
+  "noNotifications": "No notifications yet"
 }

@@ -2,9 +2,10 @@ import 'package:bugsnag_flutter/bugsnag_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:evim_furniture/src/core/di/injection.dart';
 import 'package:evim_furniture/src/core/router/app_router.dart';
+import 'package:evim_furniture/src/core/services/notification_service.dart';
 import 'package:evim_furniture/src/core/theme/app_theme.dart';
 import 'package:evim_furniture/src/core/theme/theme_controller.dart';
-import 'package:evim_furniture/src/features/shell/presentation/screens/shell_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,15 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupDi();
+
+  // Initialize notification service
+  await NotificationService.instance.init();
+
+  // If user is logged in, register FCM token and listen for refreshes
+  if (FirebaseAuth.instance.currentUser != null) {
+    NotificationService.instance.registerToken();
+    NotificationService.instance.listenTokenRefresh();
+  }
 
   runApp(
     EasyLocalization(

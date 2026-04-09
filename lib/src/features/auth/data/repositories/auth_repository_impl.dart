@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../domain/model/login_response.dart';
 import '../../domain/model/otp_response.dart';
+import '../../domain/model/user_model.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
 
@@ -18,6 +22,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   static const _idTokenKey = 'id_token';
 
+  // Phone OTP
   @override
   Future<SendOtpResponse> sendOtp({required String phone}) =>
       remoteDataSource.sendOtp(phone: phone);
@@ -33,6 +38,19 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<SendOtpResponse> resendOtp({required String phone}) =>
       remoteDataSource.resendOtp(phone: phone);
 
+  // Email OTP
+  @override
+  Future<SendOtpResponse> sendEmailOtp({required String email}) =>
+      remoteDataSource.sendEmailOtp(email: email);
+
+  @override
+  Future<VerifyOtpResponse> verifyEmailOtp({
+    required String email,
+    required String code,
+  }) =>
+      remoteDataSource.verifyEmailOtp(email: email, code: code);
+
+  // Firebase + Token
   @override
   Future<String> signInWithCustomToken(String customToken) async {
     final credential = await firebaseAuth.signInWithCustomToken(customToken);
@@ -55,4 +73,55 @@ class AuthRepositoryImpl implements AuthRepository {
     await firebaseAuth.signOut();
     await secureStorage.delete(key: _idTokenKey);
   }
+
+  // Social login
+  @override
+  Future<UserCredential> signInWithGoogle() async {
+    final googleSignIn = GoogleSignIn.instance;
+    await googleSignIn.initialize();
+    final googleUser = await googleSignIn.authenticate();
+    final idToken = googleUser.authentication.idToken;
+    if (idToken == null) throw Exception('Google sign-in failed: no idToken');
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
+    return firebaseAuth.signInWithCredential(credential);
+  }
+
+  @override
+  Future<UserCredential> signInWithApple() async {
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+    final credential = OAuthProvider('apple.com').credential(
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
+    );
+    return firebaseAuth.signInWithCredential(credential);
+  }
+
+  @override
+  Future<LoginResponse> socialLogin() => remoteDataSource.socialLogin();
+
+  // Profile
+  @override
+  Future<UserModel> completeProfile({
+    required String name,
+    required String userType,
+    String? picturePath,
+  }) =>
+      remoteDataSource.completeProfile(
+        name: name,
+        userType: userType,
+        picturePath: picturePath,
+      );
+
+  @override
+  Future<UserModel> editProfile({String? name, String? picturePath}) =>
+      remoteDataSource.editProfile(name: name, picturePath: picturePath);
+
+  // User
+  @override
+  Future<UserModel> getMe() => remoteDataSource.getMe();
 }

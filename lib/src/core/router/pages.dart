@@ -6,4 +6,6 @@ class Pages {
   static const String otp = '/otp';
   static const String completeProfile = '/completeProfile';
   static const String home = '/home';
+  static const String editProfile = '/editProfile';
+  static const String notifications = '/notifications';
 }

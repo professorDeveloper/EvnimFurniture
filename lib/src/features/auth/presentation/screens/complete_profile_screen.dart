@@ -3,15 +3,21 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:evim_furniture/src/core/constants/app_colors.dart';
 import 'package:evim_furniture/src/core/constants/app_texts.dart';
+import 'package:evim_furniture/src/core/di/injection.dart';
 import 'package:evim_furniture/src/core/router/pages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../bloc/auth_bloc.dart';
 
 enum UserType { mijoz, diller, boshqa }
 
 class CompleteProfileScreen extends StatefulWidget {
-  const CompleteProfileScreen({super.key});
+  const CompleteProfileScreen({super.key, this.initialName});
+
+  final String? initialName;
 
   @override
   State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
@@ -20,19 +26,41 @@ class CompleteProfileScreen extends StatefulWidget {
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
+  late AuthBloc _authBloc;
 
   UserType _selectedType = UserType.mijoz;
   String? _avatarPath;
   bool _nameError = false;
 
   @override
+  void initState() {
+    super.initState();
+    _authBloc = sl<AuthBloc>();
+    if (widget.initialName != null && widget.initialName!.isNotEmpty) {
+      _nameController.text = widget.initialName!;
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _nameFocus.dispose();
+    _authBloc.close();
     super.dispose();
   }
 
   bool get _isValid => _nameController.text.trim().isNotEmpty;
+
+  String get _userTypeValue {
+    switch (_selectedType) {
+      case UserType.mijoz:
+        return 'mijoz';
+      case UserType.diller:
+        return 'sotuvchi';
+      case UserType.boshqa:
+        return 'boshqa';
+    }
+  }
 
   final ImagePicker _picker = ImagePicker();
 
@@ -165,12 +193,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       return;
     }
 
-    // TODO: Call complete profile API with:
-    // name: _nameController.text.trim()
-    // userType: _selectedType.name
-    // picture: _avatarPath
-
-    Navigator.pushNamedAndRemoveUntil(context, Pages.home, (_) => false);
+    _authBloc.add(CompleteProfileEvent(
+      name: _nameController.text.trim(),
+      userType: _userTypeValue,
+      picturePath: _avatarPath,
+    ));
   }
 
   @override
@@ -178,7 +205,26 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
+    return BlocProvider.value(
+      value: _authBloc,
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is ProfileSaved) {
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              Pages.home,
+              (_) => false,
+            );
+          } else if (state is ProfileSaveError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: cs.error,
+              ),
+            );
+          }
+        },
+        child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -454,34 +500,52 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       const SizedBox(height: 24),
 
                       // Complete button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _onComplete,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.secondary,
-                            foregroundColor: AppColors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                AppTexts.authCompleteBtn.tr(),
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final isLoading = state is ProfileSaving;
+                          return SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : _onComplete,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.secondary,
+                                foregroundColor: AppColors.white,
+                                disabledBackgroundColor:
+                                    AppColors.secondary.withOpacity(0.5),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward_rounded, size: 18),
-                            ],
-                          ),
-                        ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: AppColors.white,
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          AppTexts.authCompleteBtn.tr(),
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Icon(
+                                            Icons.arrow_forward_rounded,
+                                            size: 18),
+                                      ],
+                                    ),
+                            ),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 24),
@@ -493,9 +557,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           },
         ),
       ),
+        ),
+      ),
     );
   }
 }
+
 
 class _UserTypeCard extends StatelessWidget {
   const _UserTypeCard({

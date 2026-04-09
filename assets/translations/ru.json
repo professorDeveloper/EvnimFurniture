@@ -88,5 +88,13 @@
   "authPickPhoto": "Выбрать фото",
   "authPickCamera": "Камера",
   "authPickGallery": "Галерея",
-  "authPickRemove": "Удалить фото"
+  "authPickRemove": "Удалить фото",
+  "logout": "Выйти",
+  "logoutConfirm": "Вы уверены, что хотите выйти?",
+  "logoutConfirmDesc": "Вы выйдете из аккаунта. Для повторного входа потребуется подтверждение по телефону или email.",
+  "cancel": "Отмена",
+  "editProfile": "Редактировать профиль",
+  "save": "Сохранить",
+  "notifications": "Уведомления",
+  "noNotifications": "Уведомлений пока нет"
 }

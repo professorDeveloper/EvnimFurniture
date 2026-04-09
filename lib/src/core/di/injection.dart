@@ -15,7 +15,19 @@ import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/send_otp_usecase.dart';
 import '../../features/auth/domain/usecases/verify_otp_usecase.dart';
 import '../../features/auth/domain/usecases/resend_otp_usecase.dart';
+import '../../features/auth/domain/usecases/send_email_otp_usecase.dart';
+import '../../features/auth/domain/usecases/verify_email_otp_usecase.dart';
+import '../../features/auth/domain/usecases/get_me_usecase.dart';
+import '../../features/auth/domain/usecases/complete_profile_usecase.dart';
+import '../../features/auth/domain/usecases/edit_profile_usecase.dart';
+import '../../features/auth/domain/usecases/social_login_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+
+import '../../features/notifications/data/datasources/notification_remote_datasource.dart';
+import '../../features/notifications/data/repositories/notification_repository_impl.dart';
+import '../../features/notifications/domain/repositories/notification_repository.dart';
+import '../../features/notifications/domain/usecases/get_notifications_usecase.dart';
+import '../../features/notifications/presentation/bloc/notification_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -56,10 +68,36 @@ Future<void> setupDi() async {
   sl.registerLazySingleton(() => SendOtpUseCase(sl()));
   sl.registerLazySingleton(() => VerifyOtpUseCase(sl()));
   sl.registerLazySingleton(() => ResendOtpUseCase(sl()));
+  sl.registerLazySingleton(() => SendEmailOtpUseCase(sl()));
+  sl.registerLazySingleton(() => VerifyEmailOtpUseCase(sl()));
+  sl.registerLazySingleton(() => GetMeUseCase(sl()));
+  sl.registerLazySingleton(() => CompleteProfileUseCase(sl()));
+  sl.registerLazySingleton(() => EditProfileUseCase(sl()));
+  sl.registerLazySingleton(() => SocialLoginUseCase(sl()));
 
   sl.registerFactory(() => AuthBloc(
         sendOtpUseCase: sl(),
         verifyOtpUseCase: sl(),
         resendOtpUseCase: sl(),
+        sendEmailOtpUseCase: sl(),
+        verifyEmailOtpUseCase: sl(),
+        getMeUseCase: sl(),
+        completeProfileUseCase: sl(),
+        editProfileUseCase: sl(),
+        socialLoginUseCase: sl(),
+        authRepository: sl(),
       ));
+
+  // Notifications
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(dioClient: sl()),
+  );
+
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+
+  sl.registerFactory(() => NotificationBloc(useCase: sl()));
 }
