@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
 import '../network/dio_client.dart';
@@ -35,9 +34,6 @@ Future<void> setupDi() async {
   // Core
   sl.registerLazySingleton<DioClient>(() => DioClient());
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-  sl.registerLazySingleton<FlutterSecureStorage>(
-    () => const FlutterSecureStorage(),
-  );
 
   // Home
   sl.registerLazySingleton<HomeRemoteDataSource>(
@@ -61,7 +57,6 @@ Future<void> setupDi() async {
     () => AuthRepositoryImpl(
       remoteDataSource: sl(),
       firebaseAuth: sl(),
-      secureStorage: sl(),
     ),
   );
 

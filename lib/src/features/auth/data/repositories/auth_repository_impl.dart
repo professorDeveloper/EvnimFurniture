@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -13,14 +12,10 @@ class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.firebaseAuth,
-    required this.secureStorage,
   });
 
   final AuthRemoteDataSource remoteDataSource;
   final FirebaseAuth firebaseAuth;
-  final FlutterSecureStorage secureStorage;
-
-  static const _idTokenKey = 'id_token';
 
   // Phone OTP
   @override
@@ -52,26 +47,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
   // Firebase + Token
   @override
-  Future<String> signInWithCustomToken(String customToken) async {
-    final credential = await firebaseAuth.signInWithCustomToken(customToken);
-    final idToken = await credential.user!.getIdToken();
-    return idToken!;
-  }
-
-  @override
-  Future<void> saveIdToken(String idToken) async {
-    await secureStorage.write(key: _idTokenKey, value: idToken);
-  }
-
-  @override
-  Future<String?> getIdToken() async {
-    return secureStorage.read(key: _idTokenKey);
+  Future<void> signInWithCustomToken(String customToken) async {
+    await firebaseAuth.signInWithCustomToken(customToken);
   }
 
   @override
   Future<void> logout() async {
     await firebaseAuth.signOut();
-    await secureStorage.delete(key: _idTokenKey);
   }
 
   // Social login

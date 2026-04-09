@@ -21,9 +21,7 @@ abstract class AuthRepository {
   });
 
   // Firebase + Token
-  Future<String> signInWithCustomToken(String customToken);
-  Future<void> saveIdToken(String idToken);
-  Future<String?> getIdToken();
+  Future<void> signInWithCustomToken(String customToken);
   Future<void> logout();
 
   // Social login

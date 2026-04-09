@@ -10,11 +10,7 @@ class VerifyOtpUseCase {
   Future<bool> call({required String phone, required String code}) async {
     final response = await _repository.verifyOtp(phone: phone, code: code);
 
-    final idToken = await _repository.signInWithCustomToken(
-      response.customToken,
-    );
-
-    await _repository.saveIdToken(idToken);
+    await _repository.signInWithCustomToken(response.customToken);
 
     // Register FCM token if permission already granted
     if (NotificationService.instance.isPermissionGranted) {

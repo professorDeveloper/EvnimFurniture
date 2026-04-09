@@ -11,11 +11,7 @@ class VerifyEmailOtpUseCase {
       code: code,
     );
 
-    final idToken = await _repository.signInWithCustomToken(
-      response.customToken,
-    );
-
-    await _repository.saveIdToken(idToken);
+    await _repository.signInWithCustomToken(response.customToken);
 
     if (NotificationService.instance.isPermissionGranted) {
       NotificationService.instance.registerToken();

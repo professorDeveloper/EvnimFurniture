@@ -14,13 +14,7 @@ class SocialLoginUseCase {
         ? await _repository.signInWithApple()
         : await _repository.signInWithGoogle();
 
-    // 2. Get idToken from Firebase
-    final idToken = await userCred.user!.getIdToken();
-
-    // 3. Save idToken to secure storage (so interceptor picks it up)
-    await _repository.saveIdToken(idToken!);
-
-    // 4. Call backend POST /api/auth/login with Bearer token
+    // 2. Call backend POST /api/auth/login with Bearer token
     final response = await _repository.socialLogin();
 
     // 5. Register FCM token if permission already granted
