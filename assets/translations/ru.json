@@ -8,7 +8,11 @@
 
   "langUzbek": "O'zbek",
   "langEnglish": "English",
+  "searchNoResults": "Результаты не найдены",
   "langRussian": "Русский",
+
+  "searchHint": "Поиск...",
+  "allLoaded": "Всё загружено",
 
   "categoriesTitle": "Категории",
   "seeAll": "Смотреть все",
@@ -49,5 +53,38 @@
   "help": "Помощь",
   "rate_us": "Оценить приложение",
   "contact_support": "Связаться с поддержкой",
-  "legal_info": "Правовая информация"
+  "legal_info": "Правовая информация",
+
+  "favouritesTitle": "Избранное",
+  "favouritesEmpty": "Пока ничего нет",
+  "favouritesEmptyDesc": "Просматривайте мебель и нажмите на сердечко, чтобы сохранить",
+
+  "errorNoConnection": "Проблема с подключением",
+  "errorNoConnectionDesc": "Проверьте сетевое подключение и повторите попытку",
+  "errorRetry": "Повторить",
+
+  "materialSheetSelectFurniture": "Выберите мебель",
+  "materialSheetLoadError": "Ошибка загрузки",
+  "materialSheetRetry": "Повторить",
+  "materialSheetEmpty": "Мебель для этого материала не найдена",
+
+  "furnitureDetailMaterials": "Материалы",
+  "furnitureSheetSelectMaterial": "Выберите материал",
+
+  "detailRate": "Оценить",
+  "detailYourRating": "Ваша оценка",
+  "detailTryInRoom": "Попробовать в комнате (ИИ)",
+  "detailMaterial": "Материал",
+  "detailColor": "Цвет",
+  "detailCareInstructions": "Инструкции по уходу",
+  "detailAboutThisPiece": "Об этом изделии",
+  "detailFirstLook": "✦ Первый взгляд",
+  "detailPullDownToExpand": "Потяните вниз для развёртки",
+  "detailPhotos": "Фото",
+  "detailExpand": "Открыть",
+  "detailRatingPoor": "Плохо",
+  "detailRatingFair": "Удовлетворительно",
+  "detailRatingGood": "Хорошо",
+  "detailRatingVeryGood": "Очень хорошо",
+  "detailRatingExcellent": "Отлично!"
 }

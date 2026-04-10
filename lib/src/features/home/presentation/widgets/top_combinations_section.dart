@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/router/pages.dart';
 import '../../domain/model/combination_item.dart';
 import 'section_header.dart';
 
@@ -39,11 +40,24 @@ class TopCombinationsSection extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (_, i) => Padding(
               padding: EdgeInsets.only(right: i < items.length - 1 ? 12 : 0),
-              child: _CombinationCard(
-                item: items[i],
-                isDark: isDark,
-                cardW: cardW,
-                imgH: imgH,
+              child: TweenAnimationBuilder<double>(
+                key: ValueKey(items[i].furnitureMaterialId),
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 300 + i * 70),
+                curve: Curves.easeOutQuart,
+                builder: (_, v, child) => Opacity(
+                  opacity: v,
+                  child: Transform.translate(
+                    offset: Offset(18 * (1 - v), 0),
+                    child: child,
+                  ),
+                ),
+                child: _CombinationCard(
+                  item: items[i],
+                  isDark: isDark,
+                  cardW: cardW,
+                  imgH: imgH,
+                ),
               ),
             ),
           ),
@@ -98,6 +112,13 @@ class _CombinationCardState extends State<_CombinationCard>
   void _onTapUp(TapUpDetails _) {
     _pressCtrl.reverse();
     HapticFeedback.lightImpact();
+    Navigator.of(context).pushNamed(
+      Pages.furnitureDetail,
+      arguments: {
+        'furnitureId': widget.item.furniture.id,
+        'furnitureMaterialId': widget.item.furnitureMaterialId,
+      },
+    );
   }
 
   void _onTapCancel() => _pressCtrl.reverse();

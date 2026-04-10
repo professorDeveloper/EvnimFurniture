@@ -8,6 +8,10 @@
 
   "langUzbek": "O'zbek",
   "langEnglish": "English",
+  "searchHint": "Search...",
+  "searchNoResults": "No results found",
+  "allLoaded": "All loaded",
+
   "langRussian": "Русский",
 
   "categoriesTitle": "Categories",
@@ -49,5 +53,38 @@
   "help": "Help",
   "rate_us": "Rate Us",
   "contact_support": "Contact Support",
-  "legal_info": "Legal Information"
+  "legal_info": "Legal Information",
+
+  "favouritesTitle": "Favorites",
+  "favouritesEmpty": "No favorites yet",
+  "favouritesEmptyDesc": "Browse furniture and tap the heart to save your favorites",
+
+  "errorNoConnection": "Connection problem",
+  "errorNoConnectionDesc": "Check your network connection and try again",
+  "errorRetry": "Retry",
+
+  "materialSheetSelectFurniture": "Select furniture",
+  "materialSheetLoadError": "Failed to load",
+  "materialSheetRetry": "Retry",
+  "materialSheetEmpty": "No furniture found for this material",
+
+  "furnitureDetailMaterials": "Materials",
+  "furnitureSheetSelectMaterial": "Select material",
+
+  "detailRate": "Rate",
+  "detailYourRating": "Your rating",
+  "detailTryInRoom": "Try in your room (AI)",
+  "detailMaterial": "Material",
+  "detailColor": "Color",
+  "detailCareInstructions": "Care instructions",
+  "detailAboutThisPiece": "About this piece",
+  "detailFirstLook": "✦ First look",
+  "detailPullDownToExpand": "Pull down to expand",
+  "detailPhotos": "Photos",
+  "detailExpand": "Expand",
+  "detailRatingPoor": "Poor",
+  "detailRatingFair": "Fair",
+  "detailRatingGood": "Good",
+  "detailRatingVeryGood": "Very Good",
+  "detailRatingExcellent": "Excellent!"
 }

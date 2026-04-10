@@ -24,6 +24,10 @@ class MaterialDefaultColor {
     }
   }
 
+  @override
+  String toString() =>
+      'MaterialDefaultColor(id: $id, name: $name, hexCode: $hexCode, previewImage: $previewImage, color: $color)';
+
   factory MaterialDefaultColor.fromJson(Map<String, dynamic> json) {
     return MaterialDefaultColor(
       id: json['id'] as String? ?? '',
@@ -49,6 +53,10 @@ class MaterialStats {
       furnitureCount: (json['furnitureCount'] as num?)?.toInt() ?? 0,
     );
   }
+
+  @override
+  String toString() =>
+      'MaterialStats(viewCount: $viewCount, furnitureCount: $furnitureCount)';
 }
 
 class MaterialItem {
@@ -74,6 +82,10 @@ class MaterialItem {
 
   String? get firstImage =>
       previewImage ?? (ownImages.isNotEmpty ? ownImages.first : null);
+
+  @override
+  String toString() =>
+      'MaterialItem(id: $id, name: $name, rank: $rank, description: $description, previewImage: $previewImage, ownImages: $ownImages, defaultColor: $defaultColor, stats: $stats)';
 
   factory MaterialItem.fromJson(Map<String, dynamic> json) {
     return MaterialItem(

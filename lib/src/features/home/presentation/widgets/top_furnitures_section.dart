@@ -8,6 +8,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
 import '../../domain/model/furniture_item.dart';
 import '../../domain/model/material_item.dart';
+import 'furniture_detail_sheet.dart';
 import 'section_header.dart';
 
 class TopFurnituresSection extends StatelessWidget {
@@ -50,7 +51,12 @@ class TopFurnituresSection extends StatelessWidget {
                 isDark: isDark,
                 cardW: cardW,
                 imgH: imgH,
-                onTap: () => {}
+                onTap: () => showFurnitureDetailSheet(
+                  context: context,
+                  furnitureId: items[i].id,
+                  previewName: items[i].name,
+                  previewThumbnail: items[i].thumbnailImage,
+                ),
               ),
             ),
           ),
@@ -325,10 +331,7 @@ class _FurnitureCardState extends State<_FurnitureCard>
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
-
-                      // Stats qatori
                       _StatsRow(stats: item.stats, subColor: textSub),
-
                       if (item.colors.isNotEmpty) ...[
                         const SizedBox(height: 5),
                         _ColorSwatches(colors: item.colors),

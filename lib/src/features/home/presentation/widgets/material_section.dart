@@ -7,12 +7,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/di/injection.dart';
 import '../../domain/model/material_item.dart';
+import '../../domain/usecases/get_materials_furniture_usecase.dart';
+import 'material_furnitures_sheet.dart';
 import 'section_header.dart';
 
 class MaterialsSection extends StatelessWidget {
-  const MaterialsSection(
-      {super.key, required this.items, this.horizontalPadding = 16});
+  const MaterialsSection({
+    super.key,
+    required this.items,
+    this.horizontalPadding = 16,
+  });
 
   final List<MaterialItem> items;
   final double horizontalPadding;
@@ -96,7 +102,26 @@ class _MaterialCard extends StatelessWidget {
         : AppColors.grey400;
 
     return GestureDetector(
-      onTap: () => HapticFeedback.lightImpact(),
+      onTap: () {
+        HapticFeedback.lightImpact();
+
+        final useCase = sl<GetMaterialFurnitureUseCase>();
+
+        showMaterialFurnitureSheet(
+          context: context,
+          materialItem: item,
+          useCase: useCase,
+          onFurnitureSelected: (selectedItem) {
+            Navigator.of(context).pushNamed(
+              '/furniture-detail',
+              arguments: {
+                'furnitureId': selectedItem.furniture.id,
+                'furnitureMaterialId': selectedItem.furnitureMaterialId,
+              },
+            );
+          },
+        );
+      },
       child: SizedBox(
         width: cardW,
         child: Column(
