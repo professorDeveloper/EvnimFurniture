@@ -73,4 +73,45 @@ class AppTexts {
   static const String detailRatingVeryGood = 'detailRatingVeryGood';
   static const String detailRatingExcellent = 'detailRatingExcellent';
 
+  // Auth
+  static const String authLoginTitle = 'authLoginTitle';
+  static const String authLoginSubtitle = 'authLoginSubtitle';
+  static const String authOr = 'authOr';
+  static const String authContinueGoogle = 'authContinueGoogle';
+  static const String authContinueApple = 'authContinueApple';
+  static const String authContinueEmail = 'authContinueEmail';
+  static const String authTerms = 'authTerms';
+  static const String authEnterEmail = 'authEnterEmail';
+  static const String authEmailDesc = 'authEmailDesc';
+
+  // OTP
+  static const String authOtpTitle = 'authOtpTitle';
+  static const String authOtpSubtitle = 'authOtpSubtitle';
+  static const String authResendIn = 'authResendIn';
+  static const String authResendCode = 'authResendCode';
+  static const String authAttemptsLeft = 'authAttemptsLeft';
+  static const String authCheckEmail = 'authCheckEmail';
+  static const String authOtpSecure = 'authOtpSecure';
+  static const String authOtpSecureEmail = 'authOtpSecureEmail';
+
+  // Complete Profile
+  static const String authCompleteTitle = 'authCompleteTitle';
+  static const String authCompleteSubtitle = 'authCompleteSubtitle';
+  static const String authAvatarOptional = 'authAvatarOptional';
+  static const String authNameLabel = 'authNameLabel';
+  static const String authNameHint = 'authNameHint';
+  static const String authNameRequired = 'authNameRequired';
+  static const String authUserTypeLabel = 'authUserTypeLabel';
+  static const String authUserTypeDesc = 'authUserTypeDesc';
+  static const String authTypeMijoz = 'authTypeMijoz';
+  static const String authTypeMijozDesc = 'authTypeMijozDesc';
+  static const String authTypeDiller = 'authTypeDiller';
+  static const String authTypeDillerDesc = 'authTypeDillerDesc';
+  static const String authTypeBoshqa = 'authTypeBoshqa';
+  static const String authTypeBoshqaDesc = 'authTypeBoshqaDesc';
+  static const String authCompleteBtn = 'authCompleteBtn';
+  static const String authPickPhoto = 'authPickPhoto';
+  static const String authPickCamera = 'authPickCamera';
+  static const String authPickGallery = 'authPickGallery';
+  static const String authPickRemove = 'authPickRemove';
 }

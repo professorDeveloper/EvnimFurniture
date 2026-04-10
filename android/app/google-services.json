@@ -12,7 +12,20 @@
           "package_name": "com.saikou.evim_furniture"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "140320585865-1be7k2223bhf8pvkv4cl5bn8o37olqol.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.saikou.evim_furniture",
+            "certificate_hash": "4d03bbdb6be6b8ad0b98b08f896da2b1dd7fc75f"
+          }
+        },
+        {
+          "client_id": "140320585865-dne0q7gr31dd7jd5bppqvrn783843t7f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC7ypowuDWtfzkOEUso1Kpdhk18KuOukzA"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140320585865-dne0q7gr31dd7jd5bppqvrn783843t7f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "140320585865-llh5pr5ri12b7g3d99rnkgjfv83qgol4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.saikou.evimFurniture"
+              }
+            }
+          ]
         }
       }
     }

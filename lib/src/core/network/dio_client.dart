@@ -5,20 +5,23 @@ class DioClient {
   DioClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'http://localhost:2255/',
+        baseUrl: 'https://accessible-image-pig-championship.trycloudflare.com/',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
+        contentType: 'application/json',
         headers: {'accept': 'application/json'},
       ),
     );
 
     _dio.interceptors.add(_AuthInterceptor());
 
-    _dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      logPrint: (o) => print(o),
-    ));
+    _dio.interceptors.add(
+      LogInterceptor(
+        requestBody: true,
+        responseBody: true,
+        logPrint: (o) => print(o),
+      ),
+    );
   }
 
   late final Dio _dio;
@@ -35,15 +38,10 @@ class _AuthInterceptor extends Interceptor {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final token = await user.getIdToken();
-      if (token != null) {
+      if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
       }
     }
     handler.next(options);
-  }
-
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    handler.next(err);
   }
 }

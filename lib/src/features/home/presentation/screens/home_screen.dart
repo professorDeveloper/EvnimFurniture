@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:evim_furniture/src/core/constants/app_colors.dart';
+import 'package:evim_furniture/src/core/services/notification_service.dart';
 import 'package:evim_furniture/src/core/constants/app_icons.dart';
 import 'package:evim_furniture/src/core/constants/app_texts.dart';
 import 'package:evim_furniture/src/core/di/injection.dart';
@@ -56,7 +57,13 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
       elevation: 0,
       scrolledUnderElevation: 0,
-      title: SvgPicture.asset(AppIcons.appbarIcon, height: 33),
+      title: SvgPicture.asset(
+        AppIcons.appbarIcon,
+        height: 33,
+        colorFilter: isDark
+            ? const ColorFilter.mode(AppColors.white, BlendMode.srcIn)
+            : null,
+      ),
       centerTitle: true,
       actions: [
         Padding(
@@ -70,7 +77,15 @@ class HomeScreen extends StatelessWidget {
                   color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                   size: 24,
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  // Request permission on first tap (in-context)
+                  if (!NotificationService.instance.isPermissionGranted) {
+                    await NotificationService.instance.requestPermission();
+                  }
+                  if (context.mounted) {
+                    Navigator.pushNamed(context, '/notifications');
+                  }
+                },
               ),
               Positioned(
                 top: 10,
@@ -116,28 +131,35 @@ class _HomeBody extends StatelessWidget {
       child: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          const SliverToBoxAdapter(child: SizedBox(height: 12)),
-          SliverToBoxAdapter(child: StoriesList(items: data.stories)),
+          if (data.stories.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            SliverToBoxAdapter(child: StoriesList(items: data.stories)),
+          ],
           const SliverToBoxAdapter(child: SizedBox(height: 12)),
           SliverToBoxAdapter(
             child: BannerCarousel(banners: data.banners, isDark: isDark),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          SliverToBoxAdapter(child: CategoryList(items: data.categories)),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          SliverToBoxAdapter(
-              child: TopFurnituresSection(
-                items: data.topFurniture,
-                materials: data.topMaterials,
-              )),
-
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          SliverToBoxAdapter(child: MaterialsSection(items: data.topMaterials)),
-
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
-          if (data.topCombinations.isNotEmpty)
+          if (data.categories.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(child: CategoryList(items: data.categories)),
+          ],
+          if (data.topFurniture.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(
+                child: TopFurnituresSection(
+                  items: data.topFurniture,
+                  materials: data.topMaterials,
+                )),
+          ],
+          if (data.topMaterials.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(child: MaterialsSection(items: data.topMaterials)),
+          ],
+          if (data.topCombinations.isNotEmpty) ...[
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
             SliverToBoxAdapter(
                 child: TopCombinationsSection(items: data.topCombinations)),
+          ],
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       ),
