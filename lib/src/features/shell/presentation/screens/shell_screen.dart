@@ -3,11 +3,15 @@ import 'package:evim_furniture/src/core/constants/app_colors.dart';
 import 'package:evim_furniture/src/core/constants/app_texts.dart';
 import 'package:evim_furniture/src/features/favourites/presentation/screens/favourites_screen.dart';
 import 'package:evim_furniture/src/features/home/presentation/screens/home_screen.dart';
+import 'package:evim_furniture/src/features/materials/presentation/screens/materials_screen.dart';
 import 'package:evim_furniture/src/features/profile/presentation/screens/profile_screen.dart';
-import 'package:evim_furniture/src/features/search/presentation/screens/search_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/di/injection.dart';
+import '../../../materials/presentation/bloc/materials_bloc.dart';
 
 class ShellScreen extends StatefulWidget {
   const ShellScreen({super.key});
@@ -30,9 +34,9 @@ class _ShellScreenState extends State<ShellScreen>
       activeIcon: CupertinoIcons.house_fill,
     ),
     _NavItemData(
-      labelKey: AppTexts.navSearch,
-      icon: CupertinoIcons.search,
-      activeIcon: CupertinoIcons.search,
+      labelKey: AppTexts.materialsTitle,
+      icon: CupertinoIcons.cube_box,
+      activeIcon: CupertinoIcons.cube_box_fill,
     ),
     _NavItemData(
       labelKey: AppTexts.navFavorites,
@@ -46,9 +50,12 @@ class _ShellScreenState extends State<ShellScreen>
     ),
   ];
 
-  static const List<Widget> _pages = <Widget>[
+  static  List<Widget> _pages = <Widget>[
     HomeScreen(),
-    SearchScreen(),
+    BlocProvider(
+      create: (_) => sl<MaterialsBloc>(),
+      child: const MaterialsScreen(),
+    ),
     FavouritesScreen(),
     ProfileScreen(),
   ];

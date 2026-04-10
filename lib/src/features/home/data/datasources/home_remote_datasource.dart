@@ -6,6 +6,9 @@ import '../../domain/model/combination_item.dart';
 import '../../domain/model/furniture_item.dart';
 import '../../domain/model/material_item.dart';
 import '../../domain/model/story_item.dart';
+import '../model/furniture_detail_response.dart';
+import '../model/furniture_material_colors_response.dart';
+import '../model/material_furniture_response.dart';
 
 abstract class HomeRemoteDataSource {
   Future<List<FurnitureItem>> getTopFurniture({int limit = 10});
@@ -13,6 +16,20 @@ abstract class HomeRemoteDataSource {
   Future<List<StoryItem>> getStories({int page = 1, int limit = 20});
   Future<List<CategoryItem>> getCategories();
   Future<List<CombinationItem>> getTopCombinations({int limit = 10});
+
+  Future<MaterialFurnitureResponse> getMaterialFurniture({
+    required String materialId,
+    int page = 1,
+    int limit = 20,
+  });
+
+  Future<FurnitureDetailResponse> getFurnitureDetail({
+    required String furnitureId,
+  });
+
+  Future<FurnitureMaterialColorsResponse> getFurnitureMaterialColors({
+    required String furnitureMaterialId,
+  });
 }
 
 class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
@@ -54,6 +71,49 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
     final Response res = await dioClient.dio
         .get('/api/top/combinations', queryParameters: {'limit': limit});
     return _parseList(res, CombinationItem.fromJson);
+  }
+
+  @override
+  Future<MaterialFurnitureResponse> getMaterialFurniture({
+    required String materialId,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final Response res = await dioClient.dio.get(
+      '/api/materials/$materialId/furniture',
+      queryParameters: {'page': page, 'limit': limit},
+    );
+    final dynamic rawData = res.data;
+    if (rawData is Map<String, dynamic>) {
+      return MaterialFurnitureResponse.fromJson(rawData);
+    }
+    throw Exception('Unexpected response format for material furniture');
+  }
+
+  @override
+  Future<FurnitureDetailResponse> getFurnitureDetail({
+    required String furnitureId,
+  }) async {
+    final Response res =
+        await dioClient.dio.get('/api/furniture/$furnitureId');
+    final dynamic rawData = res.data;
+    if (rawData is Map<String, dynamic>) {
+      return FurnitureDetailResponse.fromJson(rawData);
+    }
+    throw Exception('Unexpected response format for furniture detail');
+  }
+
+  @override
+  Future<FurnitureMaterialColorsResponse> getFurnitureMaterialColors({
+    required String furnitureMaterialId,
+  }) async {
+    final Response res = await dioClient.dio
+        .get('/api/furniture-materials/$furnitureMaterialId/colors');
+    final dynamic rawData = res.data;
+    if (rawData is Map<String, dynamic>) {
+      return FurnitureMaterialColorsResponse.fromJson(rawData);
+    }
+    throw Exception('Unexpected response format for furniture material colors');
   }
 
   List<T> _parseList<T>(

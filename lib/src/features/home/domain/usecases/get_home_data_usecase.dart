@@ -15,8 +15,14 @@ class GetHomeDataUseCase {
       _repository.getTopCombinations(),
     ).wait;
 
+    // TODO: replace with _repository.getBanners() when API is ready
+    const banners = [
+      'https://cdn.azamov.me/images/banners/1773897035826-aa.png',
+    ];
+
     return HomeData(
       stories: stories,
+      banners: banners,
       categories: categories,
       topFurniture: furniture,
       topMaterials: materials,

@@ -7,6 +7,7 @@ import 'story_item.dart';
 class HomeData {
   const HomeData({
     required this.stories,
+    required this.banners,
     required this.categories,
     required this.topFurniture,
     required this.topMaterials,
@@ -14,6 +15,7 @@ class HomeData {
   });
 
   final List<StoryItem> stories;
+  final List<String> banners;
   final List<CategoryItem> categories;
   final List<FurnitureItem> topFurniture;
   final List<MaterialItem> topMaterials;

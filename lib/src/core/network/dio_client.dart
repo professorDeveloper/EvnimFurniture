@@ -31,7 +31,7 @@ class DioClient {
 
 class _AuthInterceptor extends Interceptor {
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {

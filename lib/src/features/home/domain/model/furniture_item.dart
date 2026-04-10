@@ -49,8 +49,6 @@ class FurnitureItem {
   final String? defaultMaterialId;
   final bool isFavorited;
 
-  /// Available color variants — populated from `colors` array in API response.
-  /// Falls back to [defaultColor] until backend adds the field.
   final List<MaterialDefaultColor> colors;
 
   factory FurnitureItem.fromJson(Map<String, dynamic> json) {

@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:evim_furniture/src/core/constants/app_colors.dart';
 import 'package:evim_furniture/src/core/services/notification_service.dart';
 import 'package:evim_furniture/src/core/constants/app_icons.dart';
+import 'package:evim_furniture/src/core/constants/app_texts.dart';
 import 'package:evim_furniture/src/core/di/injection.dart';
 import 'package:evim_furniture/src/features/home/domain/model/home_data.dart';
 import 'package:evim_furniture/src/features/home/presentation/bloc/home_bloc.dart';
@@ -18,10 +20,6 @@ import 'package:google_fonts/google_fonts.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  static const List<String> _banners = [
-    'https://cdn.azamov.me/images/banners/1773897035826-aa.png',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -37,7 +35,6 @@ class HomeScreen extends StatelessWidget {
               return switch (state) {
                 HomeLoaded(:final data) => _HomeBody(
                   data: data,
-                  banners: _banners,
                   isDark: isDark,
                 ),
                 HomeError(:final message) => _ErrorView(
@@ -46,7 +43,7 @@ class HomeScreen extends StatelessWidget {
                   onRetry: () =>
                       context.read<HomeBloc>().add(const LoadHomeData()),
                 ),
-                _ => _HomeLoadingBody(isDark: isDark, banners: _banners),
+                _ => _HomeLoadingBody(isDark: isDark),
               };
             },
           ),
@@ -113,12 +110,10 @@ class HomeScreen extends StatelessWidget {
 class _HomeBody extends StatelessWidget {
   const _HomeBody({
     required this.data,
-    required this.banners,
     required this.isDark,
   });
 
   final HomeData data;
-  final List<String> banners;
   final bool isDark;
 
   @override
@@ -142,7 +137,7 @@ class _HomeBody extends StatelessWidget {
           ],
           const SliverToBoxAdapter(child: SizedBox(height: 12)),
           SliverToBoxAdapter(
-            child: BannerCarousel(banners: banners, isDark: isDark),
+            child: BannerCarousel(banners: data.banners, isDark: isDark),
           ),
           if (data.categories.isNotEmpty) ...[
             const SliverToBoxAdapter(child: SizedBox(height: 18)),
@@ -173,10 +168,9 @@ class _HomeBody extends StatelessWidget {
 }
 
 class _HomeLoadingBody extends StatefulWidget {
-  const _HomeLoadingBody({required this.isDark, required this.banners});
+  const _HomeLoadingBody({required this.isDark});
 
   final bool isDark;
-  final List<String> banners;
 
   @override
   State<_HomeLoadingBody> createState() => _HomeLoadingBodyState();
@@ -217,8 +211,7 @@ class _HomeLoadingBodyState extends State<_HomeLoadingBody>
                     isDark: widget.isDark, opacity: _anim.value)),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
             SliverToBoxAdapter(
-              child: BannerCarousel(
-                  banners: widget.banners, isDark: widget.isDark),
+              child: BannerCarousel(banners: const [], isDark: widget.isDark),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
             SliverToBoxAdapter(
@@ -528,7 +521,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Internetga ulanishda muammo',
+              AppTexts.errorNoConnection.tr(),
               textAlign: TextAlign.center,
               style: GoogleFonts.dmSans(
                 fontSize: 16,
@@ -538,7 +531,7 @@ class _ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Tarmoq aloqasini tekshirib qayta urinib ko\'ring',
+              AppTexts.errorNoConnectionDesc.tr(),
               textAlign: TextAlign.center,
               style: GoogleFonts.dmSans(
                 fontSize: 13,
@@ -550,7 +543,7 @@ class _ErrorView extends StatelessWidget {
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text(
-                'Qayta yuklash',
+                AppTexts.errorRetry.tr(),
                 style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
               ),
               style: FilledButton.styleFrom(

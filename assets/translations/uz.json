@@ -8,7 +8,11 @@
 
   "langUzbek": "O'zbek",
   "langEnglish": "English",
+  "searchNoResults": "Hech narsa topilmadi",
   "langRussian": "Русский",
+  "searchHint": "Qidirish...",
+  "allLoaded": "Hammasi yuklandi",
+
 
   "categoriesTitle": "Kategoriyalar",
   "seeAll": "Barchasini ko'rish",
@@ -50,6 +54,39 @@
   "rate_us": "Baholash",
   "contact_support": "Supportga murojaat",
   "legal_info": "Huquqiy ma'lumot",
+
+  "favouritesTitle": "Sevimlilar",
+  "favouritesEmpty": "Hali hech narsa yo'q",
+  "favouritesEmptyDesc": "Mebellarni ko'rib chiqing va yoqtirganni saqlash uchun yurakchani bosing",
+
+  "errorNoConnection": "Internetga ulanishda muammo",
+  "errorNoConnectionDesc": "Tarmoq aloqasini tekshirib qayta urinib ko'ring",
+  "errorRetry": "Qayta yuklash",
+
+  "materialSheetSelectFurniture": "Mebelni tanlang",
+  "materialSheetLoadError": "Yuklanishda xatolik",
+  "materialSheetRetry": "Qayta yuklash",
+  "materialSheetEmpty": "Bu materialda mebel topilmadi",
+
+  "furnitureDetailMaterials": "Materiallar",
+  "furnitureSheetSelectMaterial": "Materialni tanlang",
+
+  "detailRate": "Baholash",
+  "detailYourRating": "Sizning bahoyingiz",
+  "detailTryInRoom": "Xonangizda sinab ko'ring (AI)",
+  "detailMaterial": "Material",
+  "detailColor": "Rang",
+  "detailCareInstructions": "Parvarish ko'rsatmalari",
+  "detailAboutThisPiece": "Bu mebel haqida",
+  "detailFirstLook": "✦ Birinchi ko'rinish",
+  "detailPullDownToExpand": "Kengaytirish uchun pastga torting",
+  "detailPhotos": "Rasmlar",
+  "detailExpand": "Kattalashtirish",
+  "detailRatingPoor": "Yomon",
+  "detailRatingFair": "Qoniqarli",
+  "detailRatingGood": "Yaxshi",
+  "detailRatingVeryGood": "Juda yaxshi",
+  "detailRatingExcellent": "A'lo!"
 
   "authLoginTitle": "Xush kelibsiz",
   "authLoginSubtitle": "Kirish yoki ro'yxatdan o'tish uchun telefon raqamingizni kiriting",
