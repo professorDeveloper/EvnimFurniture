@@ -151,7 +151,7 @@ class _ImagePane extends StatelessWidget {
             child: IgnorePointer(
               child: AnimatedOpacity(
                 duration: const Duration(milliseconds: 150),
-                opacity: (overscroll - 10) / 60,
+                opacity: ((overscroll - 10) / 60).clamp(0.0, 1.0),
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(

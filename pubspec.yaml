@@ -52,6 +52,9 @@ dependencies:
   hive_flutter: ^1.1.0
 
   image_picker: ^1.1.2
+  share_plus: ^10.1.4
+  gal: ^1.1.2
+  path_provider: ^2.1.5
   google_sign_in: ^7.2.0
   sign_in_with_apple: ^7.0.1
   firebase_messaging: ^16.1.3

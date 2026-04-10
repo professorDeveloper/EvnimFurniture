@@ -3,11 +3,13 @@
 <!--    <uses-permission android:name="android.permission.ACCE"-->
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="evim_furniture">
+        android:label="evim_furniture"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

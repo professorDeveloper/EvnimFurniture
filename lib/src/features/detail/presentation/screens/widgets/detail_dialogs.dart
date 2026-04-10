@@ -1,9 +1,5 @@
 part of '../detail_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Auth required bottom sheet
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _AuthRequiredSheet extends StatelessWidget {
   const _AuthRequiredSheet({required this.onLogin});
 
@@ -12,11 +8,10 @@ class _AuthRequiredSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.darkSurface : Colors.white;
+    final bg = isDark ? AppColors.darkSurface : AppColors.surface;
     final text = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
-    final sub = isDark
-        ? AppColors.darkOnSurface.withValues(alpha: 0.55)
-        : AppColors.grey500;
+    final sub =
+    isDark ? AppColors.darkOnSurface.withOpacity(0.55) : AppColors.grey500;
 
     return Container(
       decoration: BoxDecoration(
@@ -45,7 +40,7 @@ class _AuthRequiredSheet extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: _kGold.withValues(alpha: 0.12),
+              color: _kGold.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -67,7 +62,11 @@ class _AuthRequiredSheet extends StatelessWidget {
           Text(
             'loginRequiredDesc'.tr(),
             textAlign: TextAlign.center,
-            style: GoogleFonts.dmSans(fontSize: 13, color: sub, height: 1.5),
+            style: GoogleFonts.dmSans(
+              fontSize: 13,
+              color: sub,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -77,7 +76,7 @@ class _AuthRequiredSheet extends StatelessWidget {
               onPressed: onLogin,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _kGold,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.onPrimary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -86,7 +85,9 @@ class _AuthRequiredSheet extends StatelessWidget {
               child: Text(
                 'login'.tr(),
                 style: GoogleFonts.dmSans(
-                    fontSize: 15, fontWeight: FontWeight.w700),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -96,7 +97,10 @@ class _AuthRequiredSheet extends StatelessWidget {
             child: Text(
               'cancel'.tr(),
               style: GoogleFonts.dmSans(
-                  fontSize: 14, color: sub, fontWeight: FontWeight.w500),
+                fontSize: 14,
+                color: sub,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -105,21 +109,16 @@ class _AuthRequiredSheet extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Image source picker sheet (Camera / Gallery)
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _ImageSourceSheet extends StatelessWidget {
   const _ImageSourceSheet();
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.darkSurface : Colors.white;
+    final bg = isDark ? AppColors.darkSurface : AppColors.surface;
     final text = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
-    final sub = isDark
-        ? AppColors.darkOnSurface.withValues(alpha: 0.55)
-        : AppColors.grey500;
+    final sub =
+    isDark ? AppColors.darkOnSurface.withOpacity(0.55) : AppColors.grey500;
 
     return Container(
       decoration: BoxDecoration(
@@ -127,7 +126,11 @@ class _ImageSourceSheet extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(
-          24, 20, 24, MediaQuery.of(context).padding.bottom + 24),
+        24,
+        20,
+        24,
+        MediaQuery.of(context).padding.bottom + 24,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -152,7 +155,11 @@ class _ImageSourceSheet extends StatelessWidget {
           Text(
             'Mebelni joylashtirishni xohlagan xonangiz rasmini yuklang',
             textAlign: TextAlign.center,
-            style: GoogleFonts.dmSans(fontSize: 13, color: sub, height: 1.4),
+            style: GoogleFonts.dmSans(
+              fontSize: 13,
+              color: sub,
+              height: 1.4,
+            ),
           ),
           const SizedBox(height: 24),
           Row(
@@ -181,7 +188,10 @@ class _ImageSourceSheet extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'cancel'.tr(),
-              style: GoogleFonts.dmSans(fontSize: 14, color: sub),
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: sub,
+              ),
             ),
           ),
         ],
@@ -210,7 +220,7 @@ class _SourceTile extends StatelessWidget {
       child: Container(
         height: 96,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
+          color: isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -223,9 +233,7 @@ class _SourceTile extends StatelessWidget {
               style: GoogleFonts.dmSans(
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
-                color: isDark
-                    ? AppColors.darkOnSurface
-                    : AppColors.onSurface,
+                color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
               ),
             ),
           ],
@@ -235,12 +243,10 @@ class _SourceTile extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AI loading dialog
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _AiLoadingDialog extends StatefulWidget {
-  const _AiLoadingDialog();
+  const _AiLoadingDialog({required this.onCancel});
+
+  final VoidCallback onCancel;
 
   @override
   State<_AiLoadingDialog> createState() => _AiLoadingDialogState();
@@ -248,99 +254,163 @@ class _AiLoadingDialog extends StatefulWidget {
 
 class _AiLoadingDialogState extends State<_AiLoadingDialog>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
+  static const _maxSeconds = 50;
+
+  late final AnimationController _pulseCtrl;
   late final Animation<double> _pulse;
-  int _dotCount = 0;
-  late final Timer _dotTimer;
+  late final Timer _ticker;
+
+  int _ticks = 0;
+  bool _timedOut = false;
+
+  int get _elapsed => _ticks ~/ 2;
+  int get _dotCount => _ticks % 4;
+  double get _progress => (_elapsed / _maxSeconds).clamp(0.0, 1.0);
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(
+    _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
     _pulse = Tween<double>(begin: 0.88, end: 1.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
     );
-    _dotTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
-      if (mounted) setState(() => _dotCount = (_dotCount + 1) % 4);
+    _ticker = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (!mounted) return;
+      setState(() => _ticks++);
+      if (_elapsed >= _maxSeconds && !_timedOut) {
+        setState(() => _timedOut = true);
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) widget.onCancel();
+        });
+      }
     });
   }
 
   @override
   void dispose() {
-    _ctrl.dispose();
-    _dotTimer.cancel();
+    _pulseCtrl.dispose();
+    _ticker.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.darkSurface : Colors.white;
+    final bg = isDark ? AppColors.darkSurface : AppColors.surface;
     final text = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
-    final sub = isDark
-        ? AppColors.darkOnSurface.withValues(alpha: 0.55)
-        : AppColors.grey500;
+    final sub =
+    isDark ? AppColors.darkOnSurface.withOpacity(0.55) : AppColors.grey500;
     final dots = '.' * _dotCount;
+    final remaining = _maxSeconds - _elapsed;
 
     return PopScope(
       canPop: false,
       child: Dialog(
         backgroundColor: bg,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
         elevation: 0,
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 32, vertical: 36),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ScaleTransition(
-                scale: _pulse,
+                scale: _timedOut ? const AlwaysStoppedAnimation(1.0) : _pulse,
                 child: Container(
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: _kGold.withValues(alpha: 0.12),
+                    color: _timedOut
+                        ? (isDark
+                        ? AppColors.darkSurfaceVariant
+                        : AppColors.grey200)
+                        : _kGold.withOpacity(0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.auto_awesome_rounded,
-                    color: _kGold,
+                  child: Icon(
+                    _timedOut
+                        ? Icons.access_time_rounded
+                        : Icons.auto_awesome_rounded,
+                    color: _timedOut ? AppColors.grey500 : _kGold,
                     size: 36,
                   ),
                 ),
               ),
-              const SizedBox(height: 22),
-              Text(
-                'AI tayyorlamoqda$dots',
-                style: GoogleFonts.dmSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: text,
+              const SizedBox(height: 20),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _timedOut ? 'Vaqt tugadi' : 'AI tayyorlamoqda$dots',
+                  key: ValueKey(_timedOut),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: text,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                '10–20 soniya kutib turing\nIltimos, sahifani yopmang',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.dmSans(
-                    fontSize: 13, color: sub, height: 1.5),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Text(
+                  _timedOut
+                      ? 'Keyinroq urinib ko\'ring'
+                      : 'Iltimos, sahifani yopmang',
+                  key: ValueKey(_timedOut),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    color: sub,
+                    height: 1.5,
+                  ),
+                ),
               ),
-              const SizedBox(height: 24),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: AnimatedBuilder(
-                  animation: _ctrl,
-                  builder: (_, __) => LinearProgressIndicator(
-                    backgroundColor:
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: _progress,
+                        backgroundColor:
                         isDark ? AppColors.darkDivider : AppColors.grey100,
-                    valueColor:
-                        const AlwaysStoppedAnimation<Color>(_kGold),
-                    minHeight: 4,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _timedOut ? AppColors.grey400 : _kGold,
+                        ),
+                        minHeight: 4,
+                      ),
+                    ),
+                  ),
+                  if (!_timedOut) ...[
+                    const SizedBox(width: 10),
+                    Text(
+                      '$remaining s',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: sub,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: widget.onCancel,
+                child: Text(
+                  'Bekor qilish',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 14,
+                    color: sub,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -352,107 +422,266 @@ class _AiLoadingDialogState extends State<_AiLoadingDialog>
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// AI result full-screen page
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _AiResultPage extends StatelessWidget {
-  const _AiResultPage({required this.base64Image, this.remaining});
+class _AiResultPage extends StatefulWidget {
+  const _AiResultPage({required this.base64Image});
 
   final String base64Image;
-  final int? remaining;
 
-  Uint8List _decode() {
-    final str = base64Image.contains(',')
-        ? base64Image.split(',').last
-        : base64Image;
+  @override
+  State<_AiResultPage> createState() => _AiResultPageState();
+}
+
+class _AiResultPageState extends State<_AiResultPage> {
+  bool _saving = false;
+  bool _sharing = false;
+  late final Uint8List _bytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _bytes = _decode(widget.base64Image);
+  }
+
+  Uint8List _decode(String source) {
+    final str = source.contains(',') ? source.split(',').last : source;
     return base64Decode(str);
+  }
+
+  void _showSnack(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.dmSans(color: AppColors.onPrimary),
+        ),
+        backgroundColor: isError ? AppColors.error : AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  Future<void> _save(Uint8List bytes) async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    try {
+      await Gal.putImageBytes(
+        bytes,
+      );
+      _showSnack('Galereyaga saqlandi');
+    } catch (_) {
+      _showSnack('Saqlashda xatolik yuz berdi', isError: true);
+    } finally {
+      if (mounted) {
+        setState(() => _saving = false);
+      }
+    }
+  }
+
+  Future<void> _share(Uint8List bytes) async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    try {
+      final dir = await getTemporaryDirectory();
+      final file =
+      File('${dir.path}/ai_result_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      await file.writeAsBytes(bytes);
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        subject: 'AI Natija',
+      );
+    } catch (_) {
+      _showSnack('Ulashishda xatolik yuz berdi', isError: true);
+    } finally {
+      if (mounted) {
+        setState(() => _sharing = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final bytes = _decode();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final safeBtm = MediaQuery.of(context).padding.bottom;
+    final pageBg = isDark ? AppColors.darkBackground : AppColors.background;
+    final panelBg = isDark ? AppColors.darkSurface : AppColors.surface;
+    final text = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
+    final hint = isDark
+        ? AppColors.darkOnSurface.withOpacity(0.38)
+        : AppColors.onSurfaceVariant.withOpacity(0.65);
+    final borderColor = isDark ? AppColors.darkDivider : AppColors.divider;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: pageBg,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: pageBg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.white, size: 18),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: text,
+            size: 18,
+          ),
         ),
         centerTitle: true,
         title: Text(
           'AI Natija',
           style: GoogleFonts.dmSans(
-            color: Colors.white,
+            color: text,
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
         ),
-        actions: [
-          if (remaining != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 14),
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _kGold.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '$remaining ta qoldi',
-                    style: GoogleFonts.dmSans(
-                      color: _kGold,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: InteractiveViewer(
-              panEnabled: true,
-              minScale: 0.5,
-              maxScale: 4.0,
+            child: ColoredBox(
+              color: pageBg,
               child: Center(
-                child: Image.memory(
-                  bytes,
-                  fit: BoxFit.contain,
-                  gaplessPlayback: true,
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: Image.memory(
+                    _bytes,
+                    fit: BoxFit.contain,
+                    gaplessPlayback: true,
+                  ),
                 ),
               ),
             ),
           ),
           Container(
-            color: Colors.black,
-            padding: EdgeInsets.fromLTRB(
-                24, 10, 24, MediaQuery.of(context).padding.bottom + 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            decoration: BoxDecoration(
+              color: panelBg,
+              border: Border(
+                top: BorderSide(color: borderColor),
+              ),
+            ),
+            padding: EdgeInsets.fromLTRB(20, 12, 20, safeBtm + 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.pinch_rounded,
-                    color: Colors.white38, size: 16),
-                const SizedBox(width: 6),
-                Text(
-                  'Kattalashtirish uchun ikki barmoq bilan tortib ko\'ring',
-                  style:
-                      GoogleFonts.dmSans(color: Colors.white38, fontSize: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _AiActionBtn(
+                        icon: Icons.download_rounded,
+                        label: 'Saqlash',
+                        loading: _saving,
+                        onTap: () => _save(_bytes),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _AiActionBtn(
+                        icon: Icons.share_rounded,
+                        label: 'Ulashish',
+                        loading: _sharing,
+                        onTap: () => _share(_bytes),
+                        outlined: true,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.pinch_rounded,
+                      color: hint,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Kattalashtirish uchun ikki barmoq bilan tortib ko\'ring',
+                      style: GoogleFonts.dmSans(
+                        color: hint,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AiActionBtn extends StatelessWidget {
+  const _AiActionBtn({
+    required this.icon,
+    required this.label,
+    required this.loading,
+    required this.onTap,
+    this.outlined = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool loading;
+  final VoidCallback onTap;
+  final bool outlined;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background = outlined
+        ? (isDark ? AppColors.darkSurfaceVariant : AppColors.surfaceVariant)
+        : _kGold;
+    final foreground = outlined ? _kGold : AppColors.onPrimary;
+
+    return GestureDetector(
+      onTap: loading ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 48,
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(14),
+          border: outlined
+              ? Border.all(color: _kGold.withOpacity(0.7), width: 1.5)
+              : null,
+        ),
+        child: Center(
+          child: loading
+              ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: foreground,
+            ),
+          )
+              : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: foreground,
+              ),
+              const SizedBox(width: 7),
+              Text(
+                label,
+                style: GoogleFonts.dmSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: foreground,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -58,6 +58,8 @@
     <string>Profil rasmi olish uchun</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Profil rasmini tanlash uchun</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>AI natijasini galereyaga saqlash uchun</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

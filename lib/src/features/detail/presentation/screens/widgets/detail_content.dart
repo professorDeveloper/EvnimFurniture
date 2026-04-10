@@ -59,11 +59,13 @@ class _ContentSection extends StatelessWidget {
           name: material.name,
           image: material.firstImage,
         ),
-      ...data.otherMaterials.map((m) => _MatOpt(
-            id: m.furnitureMaterialId,
-            name: m.materialName,
-            image: m.previewImage,
-          )),
+      ...data.otherMaterials
+          .where((m) => m.furnitureMaterialId != currentMaterialId)
+          .map((m) => _MatOpt(
+                id: m.furnitureMaterialId,
+                name: m.materialName,
+                image: m.previewImage,
+              )),
     ];
 
     final bg = isDark ? AppColors.darkSurface : Colors.white;
@@ -253,6 +255,33 @@ class _ContentSection extends StatelessWidget {
                 ],
               ),
             ),
+          ],
+          if (furniture.images.isNotEmpty) ...[
+            const _Div(),
+            _SectionHdr(label: 'Rasmlar'),
+            SizedBox(
+              height: 120,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+                itemCount: furniture.images.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (_, i) => ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: CachedNetworkImage(
+                      imageUrl: furniture.images[i],
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) =>
+                          const ColoredBox(color: AppColors.grey100),
+                      errorWidget: (_, __, ___) => const _ImgPlaceholder(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
           ],
           if (furniture.description?.isNotEmpty ?? false) ...[
             const _Div(),

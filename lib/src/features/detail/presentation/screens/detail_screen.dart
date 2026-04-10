@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
+
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart' as dio_pkg;
@@ -9,9 +11,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gal/gal.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
@@ -316,10 +321,19 @@ class _DetailViewState extends State<_DetailView>
         await ImagePicker().pickImage(source: source, imageQuality: 75);
     if (picked == null || !mounted) return;
 
+    final cancelToken = dio_pkg.CancelToken();
+    bool cancelled = false;
+
     unawaited(showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const _AiLoadingDialog(),
+      builder: (_) => _AiLoadingDialog(
+        onCancel: () {
+          cancelled = true;
+          cancelToken.cancel();
+          if (mounted) Navigator.of(context).pop();
+        },
+      ),
     ));
 
     try {
@@ -351,14 +365,14 @@ class _DetailViewState extends State<_DetailView>
           receiveTimeout: const Duration(seconds: 120),
           sendTimeout: const Duration(seconds: 60),
         ),
+        cancelToken: cancelToken,
       );
 
-      if (!mounted) return;
+      if (!mounted || cancelled) return;
       Navigator.of(context).pop();
 
       final base64Image =
           (response.data?['data']?['image'] as String?) ?? '';
-      final remaining = (response.data?['remaining'] as num?)?.toInt();
 
       if (base64Image.isEmpty) {
         _showAiError('Xatolik yuz berdi. Qayta urinib ko\'ring.');
@@ -366,10 +380,10 @@ class _DetailViewState extends State<_DetailView>
       }
 
       Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) =>
-            _AiResultPage(base64Image: base64Image, remaining: remaining),
+        builder: (_) => _AiResultPage(base64Image: base64Image),
       ));
     } on dio_pkg.DioException catch (e) {
+      if (dio_pkg.CancelToken.isCancel(e) || cancelled) return;
       if (!mounted) return;
       Navigator.of(context).pop();
       final code = e.response?.statusCode;
@@ -382,7 +396,7 @@ class _DetailViewState extends State<_DetailView>
         _showAiError('Serverda xatolik yuz berdi. Qayta urinib ko\'ring.');
       }
     } catch (_) {
-      if (!mounted) return;
+      if (cancelled || !mounted) return;
       Navigator.of(context).pop();
       _showAiError('Xatolik yuz berdi. Qayta urinib ko\'ring.');
     }
