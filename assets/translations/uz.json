@@ -32,6 +32,8 @@
   "navProfile": "Profil",
   "welcome_to": "{} ga xush kelibsiz",
   "need_login_to_continue": "Davom etish uchun tizimga kiring",
+  "loginRequired": "Kirish talab etiladi",
+  "loginRequiredDesc": "Bu amalni bajarish uchun hisobingizga kiring.",
   "login": "Kirish",
   "settings": "Sozlamalar",
   "info": "Ma'lumot",

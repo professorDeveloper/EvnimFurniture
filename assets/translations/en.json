@@ -40,6 +40,8 @@
 
   "welcome_to": "Welcome to {}",
   "need_login_to_continue": "Sign in to continue",
+  "loginRequired": "Login Required",
+  "loginRequiredDesc": "Please sign in to your account to perform this action.",
   "login": "Sign In",
 
   "settings": "Settings",
