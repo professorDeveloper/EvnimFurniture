@@ -20,8 +20,7 @@ class NotificationsScreen extends StatelessWidget {
     final text = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
 
     return BlocProvider(
-      create: (_) =>
-          sl<NotificationBloc>()..add(const LoadNotifications()),
+      create: (_) =>  sl<NotificationBloc>()..add(const LoadNotifications()),
       child: Scaffold(
         backgroundColor: bg,
         appBar: AppBar(

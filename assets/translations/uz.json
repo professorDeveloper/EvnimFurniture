@@ -1,76 +1,60 @@
 {
   "appName": "Evim Furniture",
   "appTagline": "Uyingiz, uslubingiz",
-
   "chooseLanguageTitle": "Tilni tanlang",
   "chooseLanguageDesc": "Evim Furniture dan qulay foydalanish\nuchun tilni tanlang",
   "selectLanguage": "Tilni tanlang",
-
   "langUzbek": "O'zbek",
   "langEnglish": "English",
   "searchNoResults": "Hech narsa topilmadi",
   "langRussian": "Русский",
   "searchHint": "Qidirish...",
   "allLoaded": "Hammasi yuklandi",
-
-
   "categoriesTitle": "Kategoriyalar",
   "seeAll": "Barchasini ko'rish",
   "topFurnitures": "Top mebellar",
   "topCombinations": "Top kombinatsiyalar",
   "materialsCount": "{count} material",
   "materialsTitle": "Materiallar",
-
   "intro1Title": "Minglab mebel\nkolleksiyalari",
   "intro1Subtitle": "Qulay divandan tortib elegant yotoqxona garniturgacha — har bir xona uchun tanlangan katalog.",
   "intro2Title": "Material va uslublarni\no'rganing",
   "intro2Subtitle": "Qattiq eman, yumshoq barxat yoki tabiiy ratan bo'yicha filtrlang.",
   "intro3Title": "AR orqali uyda\nko'ring",
   "intro3Subtitle": "Kamerangizni istalgan xonaga yo'naltiring va haqiqiy o'lchamdagi mebelni joylashtiring.",
-
   "btnNext": "Keyingi",
   "btnSkip": "O'tkazib yuborish",
   "btnGetStarted": "Boshlash",
   "btnContinue": "Davom etish",
-
   "navHome": "Bosh sahifa",
   "navSearch": "Qidirish",
   "navFavorites": "Sevimlilar",
   "navProfile": "Profil",
-
   "welcome_to": "{} ga xush kelibsiz",
   "need_login_to_continue": "Davom etish uchun tizimga kiring",
   "login": "Kirish",
-
   "settings": "Sozlamalar",
   "info": "Ma'lumot",
-
   "language": "Til",
   "theme": "Mavzu",
   "theme_dark": "Tungi",
   "theme_light": "Kunduzgi",
-
   "help": "Yordam",
   "rate_us": "Baholash",
   "contact_support": "Supportga murojaat",
   "legal_info": "Huquqiy ma'lumot",
-
   "favouritesTitle": "Sevimlilar",
   "favouritesEmpty": "Hali hech narsa yo'q",
   "favouritesEmptyDesc": "Mebellarni ko'rib chiqing va yoqtirganni saqlash uchun yurakchani bosing",
-
   "errorNoConnection": "Internetga ulanishda muammo",
   "errorNoConnectionDesc": "Tarmoq aloqasini tekshirib qayta urinib ko'ring",
   "errorRetry": "Qayta yuklash",
-
   "materialSheetSelectFurniture": "Mebelni tanlang",
   "materialSheetLoadError": "Yuklanishda xatolik",
   "materialSheetRetry": "Qayta yuklash",
   "materialSheetEmpty": "Bu materialda mebel topilmadi",
-
   "furnitureDetailMaterials": "Materiallar",
   "furnitureSheetSelectMaterial": "Materialni tanlang",
-
   "detailRate": "Baholash",
   "detailYourRating": "Sizning bahoyingiz",
   "detailTryInRoom": "Xonangizda sinab ko'ring (AI)",
@@ -86,8 +70,7 @@
   "detailRatingFair": "Qoniqarli",
   "detailRatingGood": "Yaxshi",
   "detailRatingVeryGood": "Juda yaxshi",
-  "detailRatingExcellent": "A'lo!"
-
+  "detailRatingExcellent": "A'lo!",
   "authLoginTitle": "Xush kelibsiz",
   "authLoginSubtitle": "Kirish yoki ro'yxatdan o'tish uchun telefon raqamingizni kiriting",
   "authOr": "yoki",
@@ -97,7 +80,6 @@
   "authTerms": "Davom etish orqali siz Foydalanish shartlari va Maxfiylik siyosatiga rozilik bildirasiz",
   "authEnterEmail": "Email kiriting",
   "authEmailDesc": "Biz tasdiqlash kodini email manzilingizga yuboramiz",
-
   "authOtpTitle": "Tasdiqlash kodi",
   "authOtpSubtitle": "Biz kod yubordik",
   "authResendIn": "Qayta yuborish",
@@ -106,7 +88,6 @@
   "authCheckEmail": "Tasdiqlash kodi uchun email pochta qutingizni tekshiring. Biroz vaqt olishi mumkin.",
   "authOtpSecure": "Kodni hech kim bilan bo'lishmang",
   "authOtpSecureEmail": "Kodni hech kim bilan bo'lishmang",
-
   "authCompleteTitle": "Profilingizni to'ldiring",
   "authCompleteSubtitle": "Boshlash uchun o'zingiz haqingizda bir oz ma'lumot bering",
   "authAvatarOptional": "Ixtiyoriy",

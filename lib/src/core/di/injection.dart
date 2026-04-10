@@ -100,7 +100,7 @@ Future<void> setupDi() async {
   sl.registerFactory(
         () => DetailBloc(useCase: sl()),
   );
-}
+
   // Auth
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(dioClient: sl()),
