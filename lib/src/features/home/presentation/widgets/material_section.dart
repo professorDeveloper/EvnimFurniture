@@ -8,6 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/router/pages.dart';
+import '../../../view_all/presentation/screens/view_all_screen.dart';
 import '../../domain/model/material_item.dart';
 import '../../domain/usecases/get_materials_furniture_usecase.dart';
 import 'material_furnitures_sheet.dart';
@@ -30,15 +32,23 @@ class MaterialsSection extends StatelessWidget {
     final bool isTablet = w >= 600;
 
     final double cardW = isTablet ? w * 0.25 : w * 0.32;
-    final double imgH = cardW * 0.9;
+    final double imgH = cardW;
     const double zigH = 4.0;
-    final double infoH = 30.0 + 4.0 + zigH;
+    final double infoH = 38.0 + zigH;
     final double listH = imgH + infoH;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: AppTexts.materialsTitle.tr(), isDark: isDark),
+        SectionHeader(
+          title: AppTexts.materialsTitle.tr(),
+          isDark: isDark,
+          onSeeAll: () => Navigator.pushNamed(
+            context,
+            Pages.viewAll,
+            arguments: ViewAllType.materials,
+          ),
+        ),
         const SizedBox(height: 12),
         SizedBox(
           height: listH,
@@ -111,6 +121,7 @@ class _MaterialCard extends StatelessWidget {
           context: context,
           materialItem: item,
           useCase: useCase,
+          popOnSelect: false,
           onFurnitureSelected: (selectedItem) {
             Navigator.of(context).pushNamed(
               '/furniture-detail',
@@ -136,7 +147,7 @@ class _MaterialCard extends StatelessWidget {
                 child: _buildImage(),
               ),
             ),
-            SizedBox(height: zigH * 0.8),
+            SizedBox(height: zigH + 4),
             SizedBox(
               height: 16,
               child: Text(
@@ -217,6 +228,7 @@ class _MaterialCard extends StatelessWidget {
     }
     return CachedNetworkImage(
       imageUrl: url,
+      memCacheWidth: 200,
       fit: BoxFit.cover,
       placeholder: (_, __) => ColoredBox(
         color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,

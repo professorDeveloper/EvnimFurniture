@@ -26,18 +26,7 @@ class MaterialGridCard extends StatelessWidget {
     final surface = isDark ? AppColors.darkSurfaceVariant : AppColors.grey100;
     final textMain = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
 
-    return TweenAnimationBuilder<double>(
-      key: ValueKey(item.id),
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 250 + (index % 6) * 50),
-      curve: Curves.easeOutQuart,
-      builder: (_, v, child) => Opacity(
-        opacity: v,
-        child: Transform.translate(
-          offset: Offset(0, 16 * (1 - v)),
-          child: child,
-        ),
-      ),
+    return RepaintBoundary(
       child: GestureDetector(
         onTap: () {
           HapticFeedback.lightImpact();
@@ -46,7 +35,6 @@ class MaterialGridCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Rasm qismi — barcha kartochkalarda bir xil balandlik
             Expanded(
               child: ClipPath(
                 clipper: const ZigZagClipper(zigHeight: 5.0, count: 8),
@@ -57,7 +45,6 @@ class MaterialGridCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            // Text har doim 1 qator, overflow ellipsis
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
@@ -93,6 +80,7 @@ class MaterialGridCard extends StatelessWidget {
     }
     return CachedNetworkImage(
       imageUrl: url,
+      memCacheWidth: 200,
       fit: BoxFit.cover,
       placeholder: (_, __) => ColoredBox(color: surface),
       errorWidget: (_, __, ___) => ColoredBox(

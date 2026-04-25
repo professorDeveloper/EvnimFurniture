@@ -1,3 +1,4 @@
+import '../../domain/model/banner_item.dart';
 import '../../domain/model/category_model.dart';
 import '../../domain/model/combination_item.dart';
 import '../../domain/model/furniture_item.dart';
@@ -13,6 +14,9 @@ class HomeRepositoryImpl implements HomeRepository {
   const HomeRepositoryImpl({required this.remoteDataSource});
 
   final HomeRemoteDataSource remoteDataSource;
+
+  @override
+  Future<List<BannerItem>> getBanners() => remoteDataSource.getBanners();
 
   @override
   Future<List<FurnitureItem>> getTopFurniture({int limit = 10}) =>
@@ -33,6 +37,10 @@ class HomeRepositoryImpl implements HomeRepository {
   @override
   Future<List<CombinationItem>> getTopCombinations({int limit = 10}) =>
       remoteDataSource.getTopCombinations(limit: limit);
+
+  @override
+  Future<List<CombinationItem>> getTopCombinationsPaged({int page = 1, int limit = 10}) =>
+      remoteDataSource.getTopCombinations(limit: limit, page: page);
 
   @override
   Future<MaterialFurnitureResponse> getMaterialFurniture({

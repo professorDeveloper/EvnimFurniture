@@ -7,18 +7,14 @@ class GetHomeDataUseCase {
   final HomeRepository _repository;
 
   Future<HomeData> call() async {
-    final (stories, categories, furniture, materials, combinations) = await (
+    final (banners, stories, categories, furniture, materials, combinations) = await (
+      _repository.getBanners(),
       _repository.getStories(),
       _repository.getCategories(),
       _repository.getTopFurniture(),
       _repository.getTopMaterials(),
       _repository.getTopCombinations(),
     ).wait;
-
-    // TODO: replace with _repository.getBanners() when API is ready
-    const banners = [
-      'https://cdn.azamov.me/images/banners/1773897035826-aa.png',
-    ];
 
     return HomeData(
       stories: stories,

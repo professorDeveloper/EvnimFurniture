@@ -1,9 +1,5 @@
 part of '../detail_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Material option data class
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _MatOpt {
   const _MatOpt({required this.id, required this.name, this.image});
 
@@ -12,10 +8,6 @@ class _MatOpt {
   final String? image;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Content section
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _ContentSection extends StatelessWidget {
   const _ContentSection({
     required this.data,
@@ -23,13 +15,12 @@ class _ContentSection extends StatelessWidget {
     required this.colors,
     required this.colorIdx,
     required this.myRating,
-    required this.isFirstView,
-    required this.badgeScale,
     required this.isDark,
     required this.onMaterialChanged,
     required this.onColorChanged,
     required this.onRate,
     required this.onTryInRoom,
+    required this.onImageTap,
   });
 
   final FurnitureMaterialColorsResponse data;
@@ -37,13 +28,12 @@ class _ContentSection extends StatelessWidget {
   final List<FurnitureMaterialColor> colors;
   final int colorIdx;
   final int? myRating;
-  final bool isFirstView;
-  final Animation<double> badgeScale;
   final bool isDark;
   final ValueChanged<String> onMaterialChanged;
   final ValueChanged<int> onColorChanged;
   final ValueChanged<int> onRate;
   final VoidCallback onTryInRoom;
+  final ValueChanged<int> onImageTap;
 
   @override
   Widget build(BuildContext context) {
@@ -99,32 +89,6 @@ class _ContentSection extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (isFirstView)
-                      ScaleTransition(
-                        scale: badgeScale,
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 8, top: 2),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 9, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _kGold.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: _kGold.withValues(alpha: 0.5),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            AppTexts.detailFirstLook.tr(),
-                            style: GoogleFonts.dmSans(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: _kGold,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                        ),
-                      ),
                   ],
                 ),
                 if (hasMatInfo) ...[
@@ -221,6 +185,43 @@ class _ContentSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
           ],
+          if (furniture.images.isNotEmpty) ...[
+            const _Div(),
+            _SectionHdr(label: AppTexts.detailImages.tr()),
+            RepaintBoundary(
+              child: SizedBox(
+                height: 120,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+                  itemCount: furniture.images.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  itemBuilder: (_, i) => GestureDetector(
+                    onTap: () => onImageTap(i),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: CachedNetworkImage(
+                          imageUrl: furniture.images[i],
+                          memCacheWidth: 200,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => ColoredBox(
+                            color: isDark
+                                ? AppColors.darkSurfaceVariant
+                                : AppColors.grey100,
+                          ),
+                          errorWidget: (_, __, ___) =>
+                              const _ImgPlaceholder(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
           if (hasMatInfo || selectedColor != null) ...[
             const _Div(),
             Padding(
@@ -230,13 +231,15 @@ class _ContentSection extends StatelessWidget {
                 children: [
                   if (hasMatInfo)
                     _InfoPair(
-                        label: AppTexts.detailMaterial.tr(),
-                        value: material.name),
+                      label: AppTexts.detailMaterial.tr(),
+                      value: material.name,
+                    ),
                   if (selectedColor != null) ...[
                     if (hasMatInfo) const SizedBox(height: 12),
                     _InfoPair(
-                        label: AppTexts.detailColor.tr(),
-                        value: selectedColor.name),
+                      label: AppTexts.detailColor.tr(),
+                      value: selectedColor.name,
+                    ),
                   ],
                   if (hasMatInfo &&
                       (material.description?.isNotEmpty ?? false)) ...[
@@ -247,7 +250,7 @@ class _ContentSection extends StatelessWidget {
                       material.description!,
                       style: GoogleFonts.dmSans(
                         fontSize: 14,
-                        color: AppColors.onSurface,
+                        color: textMain,
                         height: 1.65,
                       ),
                     ),
@@ -255,33 +258,6 @@ class _ContentSection extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-          if (furniture.images.isNotEmpty) ...[
-            const _Div(),
-            _SectionHdr(label: 'Rasmlar'),
-            SizedBox(
-              height: 120,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
-                itemCount: furniture.images.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, i) => ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: CachedNetworkImage(
-                      imageUrl: furniture.images[i],
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) =>
-                          const ColoredBox(color: AppColors.grey100),
-                      errorWidget: (_, __, ___) => const _ImgPlaceholder(),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
           ],
           if (furniture.description?.isNotEmpty ?? false) ...[
             const _Div(),
@@ -296,7 +272,7 @@ class _ContentSection extends StatelessWidget {
                     furniture.description!,
                     style: GoogleFonts.dmSans(
                       fontSize: 14,
-                      color: AppColors.onSurface,
+                      color: textMain,
                       height: 1.65,
                     ),
                   ),
@@ -309,10 +285,6 @@ class _ContentSection extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Stats row with star rating
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _StatsRow extends StatelessWidget {
   const _StatsRow({
@@ -327,109 +299,47 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final sub = isDark
+        ? AppColors.darkOnSurface.withValues(alpha: 0.5)
+        : AppColors.grey500;
+
+    return Row(
       children: [
-        Row(
-          children: [
-            const Icon(Icons.star_rounded, color: _kStar, size: 16),
-            const SizedBox(width: 4),
-            Text(
-              stats.avgRating.toStringAsFixed(1),
-              style: GoogleFonts.dmSans(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.onSurface,
+        ...List.generate(5, (i) {
+          final filled = myRating != null
+              ? i < myRating!
+              : i < stats.avgRating.round();
+          return GestureDetector(
+            onTap: () => onRate(i + 1),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: Icon(
+                filled ? Icons.star_rounded : Icons.star_outline_rounded,
+                color: filled ? _kGold : AppColors.grey300,
+                size: 20,
               ),
             ),
-            const SizedBox(width: 5),
-            _Dot(),
-            const SizedBox(width: 5),
-            Text(
-              '${stats.ratingCount} reviews',
-              style:
-                  GoogleFonts.dmSans(fontSize: 12, color: AppColors.grey500),
-            ),
-            if (stats.viewCount > 0) ...[
-              const SizedBox(width: 5),
-              _Dot(),
-              const SizedBox(width: 5),
-              Text(
-                '${stats.viewCount} views',
-                style: GoogleFonts.dmSans(
-                    fontSize: 12, color: AppColors.grey500),
-              ),
-            ],
-          ],
+          );
+        }),
+        const SizedBox(width: 6),
+        Text(
+          '${stats.ratingCount} ${AppTexts.detailReviews.tr()}',
+          style: GoogleFonts.dmSans(fontSize: 12, color: sub),
         ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Text(
-              myRating != null
-                  ? '${AppTexts.detailYourRating.tr()}:'
-                  : '${AppTexts.detailRate.tr()}:',
-              style: GoogleFonts.dmSans(
-                fontSize: 12,
-                color: AppColors.grey500,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 8),
-            ...List.generate(5, (i) {
-              final on = myRating != null && i < myRating!;
-              return GestureDetector(
-                onTap: () => onRate(i + 1),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    transitionBuilder: (child, anim) =>
-                        ScaleTransition(scale: anim, child: child),
-                    child: Icon(
-                      on ? Icons.star_rounded : Icons.star_outline_rounded,
-                      key: ValueKey(on),
-                      color: on ? _kStar : AppColors.grey300,
-                      size: 26,
-                    ),
-                  ),
-                ),
-              );
-            }),
-            if (myRating != null) ...[
-              const SizedBox(width: 8),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Text(
-                  _rLabel(myRating!),
-                  key: ValueKey(myRating),
-                  style: GoogleFonts.dmSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: _kStar,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
+        if (stats.viewCount > 0) ...[
+          const SizedBox(width: 5),
+          _Dot(),
+          const SizedBox(width: 5),
+          Text(
+            '${stats.viewCount} ${AppTexts.detailViews.tr()}',
+            style: GoogleFonts.dmSans(fontSize: 12, color: sub),
+          ),
+        ],
       ],
     );
   }
-
-  String _rLabel(int r) => switch (r) {
-        1 => AppTexts.detailRatingPoor.tr(),
-        2 => AppTexts.detailRatingFair.tr(),
-        3 => AppTexts.detailRatingGood.tr(),
-        4 => AppTexts.detailRatingVeryGood.tr(),
-        5 => AppTexts.detailRatingExcellent.tr(),
-        _ => '',
-      };
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Material card
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _MatCard extends StatelessWidget {
   const _MatCard({
@@ -444,6 +354,15 @@ class _MatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedBorder =
+        isDark ? _kGold.withValues(alpha: 0.8) : _kDark.withValues(alpha: 0.65);
+    final unselectedBorder =
+        isDark ? AppColors.darkDivider : AppColors.grey200;
+    final labelColor = isSelected
+        ? (isDark ? AppColors.darkOnSurface : _kDark)
+        : (isDark ? AppColors.grey400 : AppColors.grey600);
+
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -459,9 +378,7 @@ class _MatCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(13),
                 border: Border.all(
-                  color: isSelected
-                      ? _kDark.withValues(alpha: 0.65)
-                      : AppColors.grey200,
+                  color: isSelected ? selectedBorder : unselectedBorder,
                   width: isSelected ? 1.8 : 1,
                 ),
                 boxShadow: isSelected
@@ -485,9 +402,13 @@ class _MatCard extends StatelessWidget {
                 child: opt.image?.isNotEmpty == true
                     ? CachedNetworkImage(
                         imageUrl: opt.image!,
+                        memCacheWidth: 200,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) =>
-                            const ColoredBox(color: AppColors.grey100),
+                        placeholder: (_, __) => ColoredBox(
+                          color: isDark
+                              ? AppColors.darkSurfaceVariant
+                              : AppColors.grey100,
+                        ),
                         errorWidget: (_, __, ___) => const _MatPh(),
                       )
                     : const _MatPh(),
@@ -498,9 +419,8 @@ class _MatCard extends StatelessWidget {
               opt.name,
               style: GoogleFonts.dmSans(
                 fontSize: 11,
-                fontWeight:
-                    isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? _kDark : AppColors.grey600,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: labelColor,
                 height: 1.2,
               ),
               maxLines: 2,
@@ -512,10 +432,6 @@ class _MatCard extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Color swatch
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _ColorSwatch extends StatelessWidget {
   const _ColorSwatch({
@@ -530,6 +446,12 @@ class _ColorSwatch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final ringColor = isDark ? _kGold : _kDark;
+    final labelColor = isSelected
+        ? (isDark ? AppColors.darkOnSurface : _kDark)
+        : AppColors.grey500;
+
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -546,7 +468,7 @@ class _ColorSwatch extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? _kDark : Colors.transparent,
+                  color: isSelected ? ringColor : Colors.transparent,
                   width: isSelected ? 1.8 : 0,
                 ),
               ),
@@ -574,7 +496,7 @@ class _ColorSwatch extends StatelessWidget {
               style: GoogleFonts.dmSans(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                color: isSelected ? _kDark : AppColors.grey500,
+                color: labelColor,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,

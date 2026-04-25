@@ -49,6 +49,8 @@ class AppTexts {
   static const String favouritesTitle = 'favouritesTitle';
   static const String favouritesEmpty = 'favouritesEmpty';
   static const String favouritesEmptyDesc = 'favouritesEmptyDesc';
+  static const String favouritesRemove = 'favouritesRemove';
+  static const String favouritesRemoveDesc = 'favouritesRemoveDesc';
 
   // Error
   static const String errorNoConnection = 'errorNoConnection';
@@ -72,6 +74,27 @@ class AppTexts {
   static const String detailRatingGood = 'detailRatingGood';
   static const String detailRatingVeryGood = 'detailRatingVeryGood';
   static const String detailRatingExcellent = 'detailRatingExcellent';
+  static const String detailImages = 'detailImages';
+  static const String detailSelectRoomPhoto = 'detailSelectRoomPhoto';
+  static const String detailSelectRoomPhotoDesc = 'detailSelectRoomPhotoDesc';
+  static const String detailAiProcessing = 'detailAiProcessing';
+  static const String detailAiTimeout = 'detailAiTimeout';
+  static const String detailAiTimeoutDesc = 'detailAiTimeoutDesc';
+  static const String detailAiProcessingDesc = 'detailAiProcessingDesc';
+  static const String detailAiResult = 'detailAiResult';
+  static const String detailShare = 'detailShare';
+  static const String detailPinchToZoom = 'detailPinchToZoom';
+  static const String detailSavedToGallery = 'detailSavedToGallery';
+  static const String detailSaveError = 'detailSaveError';
+  static const String detailShareError = 'detailShareError';
+  static const String detailAiError = 'detailAiError';
+  static const String detailAiLimitExceeded = 'detailAiLimitExceeded';
+  static const String detailAiBadRequest = 'detailAiBadRequest';
+  static const String detailAiServerError = 'detailAiServerError';
+  static const String back = 'back';
+  static const String save = 'save';
+  static const String detailReviews = 'detailReviews';
+  static const String detailViews = 'detailViews';
 
   // Auth
   static const String authLoginTitle = 'authLoginTitle';
@@ -114,4 +137,35 @@ class AppTexts {
   static const String authPickCamera = 'authPickCamera';
   static const String authPickGallery = 'authPickGallery';
   static const String authPickRemove = 'authPickRemove';
+
+  // Time formatting
+  static const String timeNow = 'timeNow';
+  static const String timeMinutesAgo = 'timeMinutesAgo';
+  static const String timeHoursAgo = 'timeHoursAgo';
+  static const String timeDaysAgo = 'timeDaysAgo';
+
+  // Categories
+  static const String categoryFurnitureCount = 'categoryFurnitureCount';
+  static const String categoryMaterialCount = 'categoryMaterialCount';
+
+  // Help screen
+  static const String helpQ1Title = 'helpQ1Title';
+  static const String helpQ1Desc = 'helpQ1Desc';
+  static const String helpQ2Title = 'helpQ2Title';
+  static const String helpQ2Desc = 'helpQ2Desc';
+  static const String helpQ3Title = 'helpQ3Title';
+  static const String helpQ3Desc = 'helpQ3Desc';
+  static const String helpQ4Title = 'helpQ4Title';
+  static const String helpQ4Desc = 'helpQ4Desc';
+  static const String helpQ5Title = 'helpQ5Title';
+  static const String helpQ5Desc = 'helpQ5Desc';
+  static const String helpQ6Title = 'helpQ6Title';
+  static const String helpQ6Desc = 'helpQ6Desc';
+
+  // Story/Video errors
+  static const String videoError = 'videoError';
+  static const String videoLoadFailed = 'videoLoadFailed';
+
+  // Route
+  static const String routeNotFound = 'routeNotFound';
 }

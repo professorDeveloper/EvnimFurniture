@@ -1,9 +1,5 @@
 part of '../detail_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Small reusable widgets
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _Dot extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
@@ -23,19 +19,22 @@ class _TagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.grey50,
+        color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey50,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.grey200),
+        border: Border.all(
+          color: isDark ? AppColors.darkDivider : AppColors.grey200,
+        ),
       ),
       child: Text(
         label,
         style: GoogleFonts.dmSans(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: AppColors.grey600,
+          color: isDark ? AppColors.darkOnSurface : AppColors.grey600,
         ),
       ),
     );
@@ -47,9 +46,13 @@ class _Div extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      child: Divider(color: AppColors.grey100, height: 1),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Divider(
+        color: isDark ? AppColors.darkDivider : AppColors.grey100,
+        height: 1,
+      ),
     );
   }
 }
@@ -61,6 +64,7 @@ class _SectionHdr extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
       child: Text(
@@ -68,7 +72,7 @@ class _SectionHdr extends StatelessWidget {
         style: GoogleFonts.dmSans(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: AppColors.onSurface,
+          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
           letterSpacing: -0.2,
         ),
       ),
@@ -103,6 +107,7 @@ class _InfoPair extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -113,7 +118,7 @@ class _InfoPair extends StatelessWidget {
           style: GoogleFonts.dmSans(
             fontSize: 17,
             fontWeight: FontWeight.w700,
-            color: AppColors.onSurface,
+            color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
             letterSpacing: -0.3,
           ),
         ),
@@ -127,10 +132,15 @@ class _ImgPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: AppColors.grey100,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ColoredBox(
+      color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
       child: Center(
-        child: Icon(Icons.chair_outlined, size: 64, color: AppColors.grey300),
+        child: Icon(
+          Icons.chair_outlined,
+          size: 64,
+          color: isDark ? AppColors.grey700 : AppColors.grey300,
+        ),
       ),
     );
   }
@@ -141,19 +151,19 @@ class _MatPh extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: AppColors.grey100,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ColoredBox(
+      color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
       child: Center(
-        child:
-            Icon(Icons.texture_rounded, size: 22, color: AppColors.grey300),
+        child: Icon(
+          Icons.texture_rounded,
+          size: 22,
+          color: isDark ? AppColors.grey700 : AppColors.grey300,
+        ),
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Loading & error state views
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _LoadingView extends StatelessWidget {
   const _LoadingView({required this.onBack});
@@ -162,10 +172,15 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final top = MediaQuery.of(context).padding.top;
     return Stack(
       children: [
-        const Positioned.fill(child: ColoredBox(color: AppColors.grey100)),
+        Positioned.fill(
+          child: ColoredBox(
+            color: isDark ? AppColors.darkBackground : AppColors.grey100,
+          ),
+        ),
         const Center(
           child: CircularProgressIndicator(
             color: AppColors.primary,
@@ -187,31 +202,77 @@ class _LoadingView extends StatelessWidget {
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.onBack});
+  const _ErrorView({required this.onBack, this.onRetry});
 
   final VoidCallback onBack;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.error_outline_rounded,
-              size: 44, color: AppColors.grey300),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: onBack,
-            child: Text(
-              'Orqaga',
-              style: GoogleFonts.dmSans(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final top = MediaQuery.of(context).padding.top;
+    return Stack(
+      children: [
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.wifi_off_rounded,
+                  size: 52,
+                  color: isDark ? AppColors.grey600 : AppColors.grey300,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  AppTexts.errorNoConnection.tr(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppTexts.errorNoConnectionDesc.tr(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    color: AppColors.grey500,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                if (onRetry != null)
+                  FilledButton.icon(
+                    onPressed: onRetry,
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: Text(
+                      AppTexts.errorRetry.tr(),
+                      style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          top: top + 8,
+          left: 12,
+          child: _HBtn(
+            icon: Icons.arrow_back_ios_new_rounded,
+            onTap: onBack,
+            collapsed: false,
+          ),
+        ),
+      ],
     );
   }
 }

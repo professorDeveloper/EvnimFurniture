@@ -213,8 +213,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LogoutEvent event,
     Emitter<AuthState> emit,
   ) async {
-    await NotificationService.instance.unregisterToken();
     await _authRepository.logout();
+
     emit(const LoggedOut());
   }
 

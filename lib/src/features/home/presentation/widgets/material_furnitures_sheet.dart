@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -6,18 +8,16 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../data/model/material_furniture_response.dart';
 import '../../domain/model/material_item.dart';
 import '../../domain/usecases/get_materials_furniture_usecase.dart';
-import 'zig_zag_clipper.dart';
 
 void showMaterialFurnitureSheet({
   required BuildContext context,
   required MaterialItem materialItem,
   required GetMaterialFurnitureUseCase useCase,
   required void Function(MaterialFurnitureItem selectedItem) onFurnitureSelected,
-  // When false, the sheet stays on the stack so the caller can push detail
-  // on top of it (back-from-detail returns to the sheet, not the caller).
   bool popOnSelect = true,
 }) {
   Navigator.of(context).push(
@@ -30,14 +30,31 @@ void showMaterialFurnitureSheet({
           onFurnitureSelected(item);
         },
       ),
-      transitionsBuilder: (_, anim, __, child) => SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, 1),
-          end: Offset.zero,
-        ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-        child: child,
-      ),
-      transitionDuration: const Duration(milliseconds: 320),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        final tween = Tween(begin: begin, end: end);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: const Cubic(0.25, 0.1, 0.25, 1.0),
+          reverseCurve: const Cubic(0.25, 0.1, 0.25, 1.0),
+        );
+
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: FadeTransition(
+            opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(
+                parent: animation,
+                curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+              ),
+            ),
+            child: child,
+          ),
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 400),
+      reverseTransitionDuration: const Duration(milliseconds: 350),
     ),
   );
 }
@@ -63,6 +80,7 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
   List<MaterialFurnitureItem> _allItems = [];
   List<MaterialFurnitureItem> _filteredItems = [];
 
+  Timer? _debounce;
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -98,6 +116,7 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _animController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
@@ -105,13 +124,16 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
   }
 
   void _onSearchChanged() {
-    final query = _searchController.text.trim().toLowerCase();
-    setState(() {
-      _filteredItems = query.isEmpty
-          ? List.of(_allItems)
-          : _allItems
-          .where((e) => e.furniture.name.toLowerCase().contains(query))
-          .toList();
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      final query = _searchController.text.trim().toLowerCase();
+      setState(() {
+        _filteredItems = query.isEmpty
+            ? List.of(_allItems)
+            : _allItems
+                .where((e) => e.furniture.name.toLowerCase().contains(query))
+                .toList();
+      });
     });
   }
 
@@ -141,8 +163,6 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.darkSurface : AppColors.white;
-    final appBarBg =
-    isDark ? AppColors.darkSurfaceVariant : const Color(0xFFF5F5F5);
     final textMain = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
     final textSub = isDark
         ? AppColors.darkOnSurface.withValues(alpha: 0.5)
@@ -154,126 +174,122 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
       backgroundColor: bg,
       body: Column(
         children: [
-          // ── AppBar ──────────────────────────────────────
           AnimatedBuilder(
             animation: _animController,
             builder: (context, _) {
-              return ClipPath(
-                clipper: _isSearching
-                    ? null
-                    : const ZigZagClipper(zigHeight: 10.0, count: 16),
-                child: Container(
-                  color: _isSearching
-                      ? (isDark ? AppColors.darkSurface : AppColors.white)
-                      : appBarBg,
-                  child: SafeArea(
-                    bottom: false,
-                    child: SizedBox(
-                      height: 56,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // ── Default row ──────────────────────
-                            FadeTransition(
-                              opacity: ReverseAnimation(_fadeAnim),
+              return Container(
+                color: bg,
+                child: SafeArea(
+                  bottom: false,
+                  child: SizedBox(
+                    height: 56,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          FadeTransition(
+                            opacity: ReverseAnimation(_fadeAnim),
+                            child: IgnorePointer(
+                              ignoring: _isSearching,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    tooltip: 'Back',
+                                    icon: Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      size: 20,
+                                      color: textMain,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  if (item.firstImage != null) ...[
+                                    _ThumbnailAvatar(
+                                      url: item.firstImage!,
+                                      isDark: isDark,
+                                    ),
+                                    const SizedBox(width: 10),
+                                  ],
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.name,
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                            color: textMain,
+                                            letterSpacing: -0.3,
+                                            height: 1.2,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          AppTexts.materialSheetSelectFurniture
+                                              .tr(),
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 12,
+                                            color: textSub,
+                                            height: 1.3,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: _openSearch,
+                                    tooltip: 'Search',
+                                    icon: Icon(
+                                      Icons.search_rounded,
+                                      size: 20,
+                                      color: textMain,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          FadeTransition(
+                            opacity: _fadeAnim,
+                            child: SlideTransition(
+                              position: _slideAnim,
                               child: IgnorePointer(
-                                ignoring: _isSearching,
+                                ignoring: !_isSearching,
                                 child: Row(
                                   children: [
-                                    _AppBarIconButton(
-                                      icon: Icons.arrow_back_ios_new_rounded,
-                                      tooltip: 'Back',
-                                      isDark: isDark,
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    if (item.firstImage != null) ...[
-                                      _ThumbnailAvatar(
-                                        url: item.firstImage!,
-                                        isDark: isDark,
+                                    IconButton(
+                                      onPressed: _closeSearch,
+                                      tooltip: 'Close search',
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new_rounded,
+                                        size: 20,
+                                        color: textMain,
                                       ),
-                                      const SizedBox(width: 10),
-                                    ],
+                                    ),
+                                    const SizedBox(width: 8),
                                     Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item.name,
-                                            style: GoogleFonts.dmSans(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w700,
-                                              color: textMain,
-                                              letterSpacing: -0.3,
-                                              height: 1.2,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Text(
-                                            AppTexts
-                                                .materialSheetSelectFurniture
-                                                .tr(),
-                                            style: GoogleFonts.dmSans(
-                                              fontSize: 12,
-                                              color: textSub,
-                                              height: 1.3,
-                                            ),
-                                          ),
-                                        ],
+                                      child: _SearchField(
+                                        controller: _searchController,
+                                        focusNode: _searchFocusNode,
+                                        isDark: isDark,
+                                        textMain: textMain,
+                                        textSub: textSub,
                                       ),
                                     ),
-                                    _AppBarIconButton(
-                                      icon: Icons.search_rounded,
-                                      tooltip: 'Search',
-                                      isDark: isDark,
-                                      onPressed: _openSearch,
-                                    ),
+                                    const SizedBox(width: 8),
                                   ],
                                 ),
                               ),
                             ),
-
-                            // ── Search row ───────────────────────
-                            FadeTransition(
-                              opacity: _fadeAnim,
-                              child: SlideTransition(
-                                position: _slideAnim,
-                                child: IgnorePointer(
-                                  ignoring: !_isSearching,
-                                  child: Row(
-                                    children: [
-                                      _AppBarIconButton(
-                                        icon:
-                                        Icons.arrow_back_ios_new_rounded,
-                                        tooltip: 'Close search',
-                                        isDark: isDark,
-                                        onPressed: _closeSearch,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: _SearchField(
-                                          controller: _searchController,
-                                          focusNode: _searchFocusNode,
-                                          isDark: isDark,
-                                          textMain: textMain,
-                                          textSub: textSub,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -281,10 +297,7 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
               );
             },
           ),
-
           Divider(height: 1, color: divider),
-
-          // ── Grid ──────────────────────────────────────────────
           Expanded(
             child: FutureBuilder<MaterialFurnitureResponse>(
               future: _future,
@@ -318,7 +331,7 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
 
                 final query = _searchController.text;
                 final displayItems =
-                query.isNotEmpty ? _filteredItems : data.furniture;
+                    query.isNotEmpty ? _filteredItems : data.furniture;
 
                 if (displayItems.isEmpty && query.isNotEmpty) {
                   return _buildNoResults(isDark);
@@ -334,67 +347,26 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
   }
 
   Widget _buildError(String message, bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline_rounded,
-              size: 44,
-              color: isDark ? AppColors.grey600 : AppColors.grey300),
-          const SizedBox(height: 12),
-          Text(AppTexts.materialSheetLoadError.tr(),
-              style: GoogleFonts.dmSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppColors.darkOnSurface
-                      : AppColors.onSurface)),
-          const SizedBox(height: 16),
-          TextButton(
-            onPressed: () => setState(() =>
-            _future =
-                widget.useCase(materialId: widget.materialItem.id)),
-            child: Text(AppTexts.materialSheetRetry.tr(),
-                style: GoogleFonts.dmSans(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary)),
-          ),
-        ],
-      ),
+    return AppErrorState(
+      onRetry: () => setState(() =>
+          _future = widget.useCase(materialId: widget.materialItem.id)),
+      isDark: isDark,
     );
   }
 
   Widget _buildEmpty(bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.inbox_rounded,
-              size: 44,
-              color: isDark ? AppColors.grey600 : AppColors.grey300),
-          const SizedBox(height: 12),
-          Text(AppTexts.materialSheetEmpty.tr(),
-              style:
-              GoogleFonts.dmSans(fontSize: 13, color: AppColors.grey500)),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.inbox_rounded,
+      title: AppTexts.materialSheetEmpty.tr(),
+      isDark: isDark,
     );
   }
 
   Widget _buildNoResults(bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.search_off_rounded,
-              size: 44,
-              color: isDark ? AppColors.grey600 : AppColors.grey300),
-          const SizedBox(height: 12),
-          Text(AppTexts.searchNoResults.tr(),
-              style:
-              GoogleFonts.dmSans(fontSize: 13, color: AppColors.grey500)),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.search_off_rounded,
+      title: AppTexts.searchNoResults.tr(),
+      isDark: isDark,
     );
   }
 
@@ -408,73 +380,20 @@ class _MaterialFurniturePageState extends State<_MaterialFurniturePage>
         childAspectRatio: 0.95,
       ),
       itemCount: items.length,
-      itemBuilder: (_, i) => _FurnitureGridCard(
-        item: items[i],
-        isDark: isDark,
-        onTap: () {
-          HapticFeedback.lightImpact();
-          debugPrint('Selected Furniture: ${items[i]}');
-          widget.onFurnitureSelected(items[i]);
-        },
+      cacheExtent: 400,
+      itemBuilder: (_, i) => RepaintBoundary(
+        child: _FurnitureGridCard(
+          item: items[i],
+          isDark: isDark,
+          onTap: () {
+            HapticFeedback.lightImpact();
+            widget.onFurnitureSelected(items[i]);
+          },
+        ),
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AppBar IconButton
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _AppBarIconButton extends StatelessWidget {
-  const _AppBarIconButton({
-    required this.icon,
-    required this.isDark,
-    required this.onPressed,
-    this.tooltip,
-  });
-
-  final IconData icon;
-  final bool isDark;
-  final VoidCallback onPressed;
-  final String? tooltip;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color iconColor =
-    isDark ? AppColors.darkOnSurface : AppColors.onSurface;
-    final Color splashColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
-        : AppColors.onSurface.withValues(alpha: 0.07);
-
-    return IconButton(
-      onPressed: onPressed,
-      tooltip: tooltip,
-      icon: Icon(icon, size: 20, color: iconColor),
-      style: IconButton.styleFrom(
-        backgroundColor:
-        isDark ? AppColors.darkSurface : AppColors.white,
-        fixedSize: const Size(38, 38),
-        shape: const CircleBorder(),
-        elevation: 0,
-        shadowColor: Colors.transparent,
-      ).copyWith(
-        overlayColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.pressed)) return splashColor;
-          if (states.contains(WidgetState.hovered)) {
-            return splashColor.withValues(alpha: 0.5);
-          }
-          return null;
-        }),
-      ),
-      padding: EdgeInsets.zero,
-      visualDensity: VisualDensity.compact,
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Search Field
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _SearchField extends StatelessWidget {
   const _SearchField({
@@ -493,8 +412,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fillColor =
-        isDark ? AppColors.darkSurfaceVariant : AppColors.grey100;
+    final fillColor = isDark ? AppColors.darkSurfaceVariant : AppColors.grey100;
 
     return Container(
       height: 40,
@@ -529,8 +447,8 @@ class _SearchField extends StatelessWidget {
             builder: (_, val, __) => val.text.isNotEmpty
                 ? GestureDetector(
                     onTap: controller.clear,
-                    child: Icon(Icons.close_rounded,
-                        size: 16, color: textSub),
+                    child:
+                        Icon(Icons.close_rounded, size: 16, color: textSub),
                   )
                 : const SizedBox.shrink(),
           ),
@@ -547,10 +465,6 @@ class _SearchField extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Thumbnail avatar in appbar
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _ThumbnailAvatar extends StatelessWidget {
   const _ThumbnailAvatar({required this.url, required this.isDark});
 
@@ -566,6 +480,7 @@ class _ThumbnailAvatar extends StatelessWidget {
         height: 38,
         child: CachedNetworkImage(
           imageUrl: url,
+          memCacheWidth: 200,
           fit: BoxFit.cover,
           placeholder: (_, __) => ColoredBox(
             color: isDark ? AppColors.darkSurface : AppColors.grey200,
@@ -580,10 +495,6 @@ class _ThumbnailAvatar extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Furniture card
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _FurnitureGridCard extends StatelessWidget {
   const _FurnitureGridCard({
@@ -625,7 +536,9 @@ class _FurnitureGridCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.52),
+                          color: isDark
+                              ? AppColors.darkSurface.withValues(alpha: 0.85)
+                              : AppColors.black.withValues(alpha: 0.52),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -639,7 +552,7 @@ class _FurnitureGridCard extends StatelessWidget {
                               style: GoogleFonts.dmSans(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                color: AppColors.white,
                                 height: 1.0,
                               ),
                             ),
@@ -680,8 +593,7 @@ class _FurnitureGridCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: item.defaultColor!.color,
-                      border:
-                      Border.all(color: AppColors.grey300, width: 0.8),
+                      border: Border.all(color: AppColors.grey300, width: 0.8),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -707,16 +619,17 @@ class _FurnitureGridCard extends StatelessWidget {
     final url = item.furniture.thumbnailImage;
     if (url == null || url.isEmpty || url == 'string') {
       return Center(
-          child: Icon(Icons.chair_outlined,
-              size: 36, color: AppColors.grey300));
+          child:
+              Icon(Icons.chair_outlined, size: 36, color: AppColors.grey300));
     }
     return CachedNetworkImage(
       imageUrl: url,
+      memCacheWidth: 400,
       fit: BoxFit.cover,
       placeholder: (_, __) => ColoredBox(color: bg),
       errorWidget: (_, __, ___) => Center(
-          child: Icon(Icons.chair_outlined,
-              size: 36, color: AppColors.grey300)),
+          child:
+              Icon(Icons.chair_outlined, size: 36, color: AppColors.grey300)),
     );
   }
 }

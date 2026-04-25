@@ -186,7 +186,7 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           elevation: 0,
-          shadowColor: AppColors.primary.withOpacity(0.3),
+          shadowColor: AppColors.primary.withValues(alpha: 0.3),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           minimumSize: const Size(double.infinity, 52),
           shape:
@@ -383,6 +383,7 @@ class AppTheme {
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.white,
         elevation: 0,
+        scrolledUnderElevation: 1,
         centerTitle: true,
         titleTextStyle: TextStyle(
           fontFamily: _fontFamily,
@@ -394,6 +395,81 @@ class AppTheme {
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.darkSurface,
+        selectedItemColor: AppColors.primary300,
+        unselectedItemColor: AppColors.grey600,
+        selectedLabelStyle: TextStyle(
+            fontFamily: _fontFamily, fontSize: 11, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: TextStyle(
+            fontFamily: _fontFamily, fontSize: 11, fontWeight: FontWeight.w400),
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.darkSurface,
+        indicatorColor: AppColors.primary900,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.primary300, size: 24);
+          }
+          return const IconThemeData(color: AppColors.grey600, size: 24);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+                fontFamily: _fontFamily,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary300);
+          }
+          return const TextStyle(
+              fontFamily: _fontFamily,
+              fontSize: 11,
+              fontWeight: FontWeight.w400,
+              color: AppColors.grey600);
+        }),
+        elevation: 0,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          minimumSize: const Size(double.infinity, 52),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: const TextStyle(
+              fontFamily: _fontFamily,
+              fontSize: 16,
+              fontWeight: FontWeight.w700),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.darkOnSurface,
+          side: const BorderSide(color: AppColors.darkDivider, width: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          minimumSize: const Size(double.infinity, 52),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          textStyle: const TextStyle(
+              fontFamily: _fontFamily,
+              fontSize: 16,
+              fontWeight: FontWeight.w600),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary300,
+          textStyle: const TextStyle(
+              fontFamily: _fontFamily,
+              fontSize: 14,
+              fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -413,21 +489,94 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary, width: 2),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary400, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary400, width: 2),
+        ),
         hintStyle: const TextStyle(
             fontFamily: _fontFamily, fontSize: 14, color: AppColors.grey600),
+        labelStyle: const TextStyle(
+            fontFamily: _fontFamily, fontSize: 14, color: AppColors.grey500),
         prefixIconColor: AppColors.grey600,
         suffixIconColor: AppColors.grey600,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.darkSurfaceVariant,
+        selectedColor: AppColors.primary900,
+        labelStyle: const TextStyle(
+            fontFamily: _fontFamily,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.darkOnSurface),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: BorderSide.none,
       ),
       dividerTheme: const DividerThemeData(
         color: AppColors.darkDivider,
         thickness: 1,
         space: 1,
       ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: AppColors.darkSurfaceVariant,
+        contentTextStyle: const TextStyle(
+            fontFamily: _fontFamily, fontSize: 14, color: AppColors.darkOnSurface),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        behavior: SnackBarBehavior.floating,
+      ),
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.darkSurface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
+        elevation: 0,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+        elevation: 4,
+        shape: CircleBorder(),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.white;
+          return AppColors.grey600;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.primary;
+          return AppColors.darkSurfaceVariant;
+        }),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return AppColors.primary;
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(AppColors.white),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        side: const BorderSide(color: AppColors.grey600, width: 1.5),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.primary,
+        circularTrackColor: AppColors.primary900,
+        linearTrackColor: AppColors.primary900,
+      ),
+      listTileTheme: const ListTileThemeData(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        minLeadingWidth: 24,
+        titleTextStyle: TextStyle(
+            fontFamily: _fontFamily,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: AppColors.darkOnSurface),
+        subtitleTextStyle: TextStyle(
+            fontFamily: _fontFamily,
+            fontSize: 13,
+            color: AppColors.grey400),
       ),
     );
   }

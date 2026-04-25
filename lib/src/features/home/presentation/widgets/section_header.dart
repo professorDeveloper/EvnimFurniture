@@ -34,21 +34,33 @@ class SectionHeader extends StatelessWidget {
               color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
             ),
           ),
-          TextButton(
-            onPressed: onSeeAll ?? () {},
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.grey500,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              textStyle: GoogleFonts.dmSans(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
+          if (onSeeAll != null)
+            GestureDetector(
+              onTap: onSeeAll,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      AppTexts.seeAll.tr(),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? AppColors.grey400 : AppColors.grey500,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: isDark ? AppColors.grey400 : AppColors.grey500,
+                    ),
+                  ],
+                ),
               ),
             ),
-            child: Text(AppTexts.seeAll.tr()),
-          ),
         ],
       ),
     );

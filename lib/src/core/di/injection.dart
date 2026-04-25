@@ -2,10 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
 import '../services/view_history_service.dart';
+import '../../features/favourites/data/datasources/favourites_remote_datasource.dart';
+import '../../features/favourites/data/repositories/favourites_repository_impl.dart';
+import '../../features/favourites/domain/repositories/favourites_repository.dart';
+import '../../features/favourites/domain/usecases/get_favourites_usecase.dart';
+import '../../features/favourites/domain/usecases/remove_favourite_usecase.dart';
+import '../../features/favourites/presentation/bloc/favourites_bloc.dart';
 import '../../features/detail/data/datasources/detail_remote_datasource.dart';
 import '../../features/detail/data/repositories/detail_repository_impl.dart';
 import '../../features/detail/domain/repositories/detail_repository.dart';
 import '../../features/detail/domain/usecases/get_detail_colors_usecase.dart';
+import '../../features/detail/domain/usecases/get_my_rating_usecase.dart';
+import '../../features/detail/domain/usecases/rate_furniture_material_usecase.dart';
+import '../../features/detail/domain/usecases/toggle_favorite_usecase.dart';
+import '../../features/detail/domain/usecases/try_in_room_usecase.dart';
 import '../../features/detail/presentation/bloc/detail_bloc.dart';
 import '../../features/home/domain/usecases/get_furniture_detail_usecase.dart';
 import '../../features/home/domain/usecases/get_furniture_material_colors_usecase.dart';
@@ -35,6 +45,18 @@ import '../../features/auth/domain/usecases/complete_profile_usecase.dart';
 import '../../features/auth/domain/usecases/edit_profile_usecase.dart';
 import '../../features/auth/domain/usecases/social_login_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+
+import '../../features/category/data/datasources/category_remote_datasource.dart';
+import '../../features/category/data/repositories/category_repository_impl.dart';
+import '../../features/category/domain/repositories/category_repository.dart';
+import '../../features/category/domain/usecases/get_categories_usecase.dart';
+import '../../features/category/domain/usecases/get_category_furniture_usecase.dart';
+import '../../features/category/presentation/bloc/categories_bloc.dart';
+import '../../features/category/presentation/bloc/category_furniture_bloc.dart';
+
+import '../../features/view_all/data/datasources/view_all_remote_datasource.dart';
+import '../../features/view_all/data/repositories/view_all_repository_impl.dart';
+import '../../features/view_all/domain/repositories/view_all_repository.dart';
 
 import '../../features/notifications/data/datasources/notification_remote_datasource.dart';
 import '../../features/notifications/data/repositories/notification_repository_impl.dart';
@@ -72,7 +94,7 @@ Future<void> setupDi() async {
         () => GetFurnitureMaterialColorsUseCase(repository: sl<HomeRepository>()),
   );
   sl.registerLazySingleton(() => GetHomeDataUseCase(sl()));
-  sl.registerFactory(() => HomeBloc(useCase: sl()));
+  sl.registerFactory(() => HomeBloc(useCase: sl(), repository: sl<HomeRepository>()));
 
   sl.registerLazySingleton<MaterialsRemoteDataSource>(
         () => MaterialsRemoteDataSourceImpl(dioClient: sl()),
@@ -97,8 +119,26 @@ Future<void> setupDi() async {
   sl.registerLazySingleton(
         () => GetDetailColorsUseCase(repository: sl<DetailRepository>()),
   );
+  sl.registerLazySingleton(
+        () => GetMyRatingUseCase(repository: sl<DetailRepository>()),
+  );
+  sl.registerLazySingleton(
+        () => RateFurnitureMaterialUseCase(repository: sl<DetailRepository>()),
+  );
+  sl.registerLazySingleton(
+        () => TryInRoomUseCase(repository: sl<DetailRepository>()),
+  );
+  sl.registerLazySingleton(
+        () => ToggleFavoriteUseCase(repository: sl<DetailRepository>()),
+  );
   sl.registerFactory(
-        () => DetailBloc(useCase: sl()),
+        () => DetailBloc(
+          useCase: sl(),
+          getMyRatingUseCase: sl(),
+          rateFurnitureMaterialUseCase: sl(),
+          tryInRoomUseCase: sl(),
+          toggleFavoriteUseCase: sl(),
+        ),
   );
 
   // Auth
@@ -148,4 +188,52 @@ Future<void> setupDi() async {
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
 
   sl.registerFactory(() => NotificationBloc(useCase: sl()));
+
+  // Category feature
+  sl.registerLazySingleton<CategoryRemoteDataSource>(
+    () => CategoryRemoteDataSourceImpl(dioClient: sl()),
+  );
+  sl.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(
+    () => GetCategoriesUseCase(repository: sl<CategoryRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => GetCategoryFurnitureUseCase(repository: sl<CategoryRepository>()),
+  );
+  sl.registerFactory(
+    () => CategoriesBloc(useCase: sl()),
+  );
+  sl.registerFactory(
+    () => CategoryFurnitureBloc(useCase: sl()),
+  );
+
+  // View All
+  sl.registerLazySingleton<ViewAllRemoteDataSource>(
+    () => ViewAllRemoteDataSourceImpl(dioClient: sl()),
+  );
+  sl.registerLazySingleton<ViewAllRepository>(
+    () => ViewAllRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Favourites
+  sl.registerLazySingleton<FavouritesRemoteDataSource>(
+    () => FavouritesRemoteDataSourceImpl(dioClient: sl()),
+  );
+  sl.registerLazySingleton<FavouritesRepository>(
+    () => FavouritesRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(
+    () => GetFavouritesUseCase(repository: sl<FavouritesRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RemoveFavouriteUseCase(repository: sl<FavouritesRepository>()),
+  );
+  sl.registerFactory(
+    () => FavouritesBloc(
+      getFavouritesUseCase: sl(),
+      removeFavouriteUseCase: sl(),
+    ),
+  );
 }

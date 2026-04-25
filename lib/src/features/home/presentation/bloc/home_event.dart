@@ -11,3 +11,7 @@ class LoadHomeData extends HomeEvent {
 class RefreshHomeData extends HomeEvent {
   const RefreshHomeData();
 }
+
+class LoadMoreCombinations extends HomeEvent {
+  const LoadMoreCombinations();
+}

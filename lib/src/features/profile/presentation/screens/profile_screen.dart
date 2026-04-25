@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -37,14 +38,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
-    _authBloc.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _authBloc,
+    return BlocProvider(
+      create: (_) => _authBloc,
       child: const _ProfileBody(),
     );
   }
@@ -336,6 +336,7 @@ class _ProfileBody extends StatelessWidget {
                     ? ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: user.picture!,
+                          memCacheWidth: 200,
                           width: 60,
                           height: 60,
                           fit: BoxFit.cover,
@@ -501,25 +502,22 @@ class _ProfileBody extends StatelessWidget {
             'icon': Icons.help_outline_rounded,
             'title': 'help'.tr(),
             'trailing': null,
-            'onTap': () {},
-          },
-          {
-            'icon': Icons.star_outline_rounded,
-            'title': 'rate_us'.tr(),
-            'trailing': null,
-            'onTap': () {},
+            'onTap': () => Navigator.pushNamed(context, Pages.help),
           },
           {
             'icon': Icons.support_agent_outlined,
             'title': 'contact_support'.tr(),
             'trailing': null,
-            'onTap': () {},
+            'onTap': () => launchUrl(
+              Uri.parse('https://t.me/evim_uzb'),
+              mode: LaunchMode.externalApplication,
+            ),
           },
           {
             'icon': Icons.privacy_tip_outlined,
             'title': 'legal_info'.tr(),
             'trailing': null,
-            'onTap': () {},
+            'onTap': () => Navigator.pushNamed(context, Pages.legalInfo),
           },
         ],
       },

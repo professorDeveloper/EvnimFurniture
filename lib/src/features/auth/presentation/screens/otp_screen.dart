@@ -69,7 +69,6 @@ class _OtpScreenState extends State<OtpScreen> {
     for (final f in _focusNodes) {
       f.dispose();
     }
-    _authBloc.close();
     super.dispose();
   }
 
@@ -144,8 +143,8 @@ class _OtpScreenState extends State<OtpScreen> {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocProvider.value(
-      value: _authBloc,
+    return BlocProvider(
+      create: (_) => _authBloc,
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is OtpVerified) {

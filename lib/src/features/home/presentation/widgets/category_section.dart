@@ -6,7 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
-import '../../domain/model/category_model.dart';
+import '../../../../core/router/pages.dart';
+import '../../../category/domain/model/category_model.dart';
 import 'section_header.dart';
 
 class CategoryList extends StatelessWidget {
@@ -20,44 +21,41 @@ class CategoryList extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final double w = MediaQuery.of(context).size.width;
-    final bool isTablet = w >= 600;
 
+    const double imgSize = 60;
+    const double gap = 16;
+    final int visibleCount =
+        ((w - horizontalPadding * 2 + gap) / (imgSize + gap)).floor().clamp(4, 6);
     final double cardW =
-    isTablet ? (w * 0.15).clamp(70.0, 100.0) : (w * 0.19).clamp(60.0, 80.0);
-    final double cardH = cardW * 0.85;
+        (w - horizontalPadding * 2 - gap * (visibleCount - 1)) / visibleCount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: AppTexts.categoriesTitle.tr(), isDark: isDark),
+        SectionHeader(
+          title: AppTexts.categoriesTitle.tr(),
+          isDark: isDark,
+          onSeeAll: () => Navigator.pushNamed(
+            context,
+            Pages.categoriesViewAll,
+          ),
+        ),
         const SizedBox(height: 12),
         SizedBox(
-          height: cardH,
-          child: ListView.builder(
+          height: cardW + 28,
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            physics: items.length <= visibleCount
+                ? const NeverScrollableScrollPhysics()
+                : const BouncingScrollPhysics(),
             itemCount: items.length,
-            itemBuilder: (_, i) => Padding(
-              padding: EdgeInsets.only(right: i < items.length - 1 ? 10 : 0),
-              child: TweenAnimationBuilder<double>(
-                key: ValueKey(items[i].id),
-                tween: Tween(begin: 0.0, end: 1.0),
-                duration: Duration(milliseconds: 260 + i * 60),
-                curve: Curves.easeOutQuart,
-                builder: (_, v, child) => Opacity(
-                  opacity: v,
-                  child: Transform.translate(
-                    offset: Offset(18 * (1 - v), 0),
-                    child: child,
-                  ),
-                ),
-                child: _CategoryCard(
-                  item: items[i],
-                  isDark: isDark,
-                  cardW: cardW,
-                  cardH: cardH,
-                ),
-              ),
+            separatorBuilder: (_, __) => const SizedBox(width: gap),
+            itemBuilder: (_, i) => _CategoryCard(
+              key: ValueKey(items[i].id),
+              item: items[i],
+              isDark: isDark,
+              cardW: cardW,
             ),
           ),
         ),
@@ -68,80 +66,61 @@ class CategoryList extends StatelessWidget {
 
 class _CategoryCard extends StatelessWidget {
   const _CategoryCard({
+    super.key,
     required this.item,
     required this.isDark,
     required this.cardW,
-    required this.cardH,
   });
 
   final CategoryItem item;
   final bool isDark;
   final double cardW;
-  final double cardH;
 
   @override
   Widget build(BuildContext context) {
+    final bgColor =
+        isDark ? AppColors.darkSurfaceVariant : const Color(0xFFF0EEEC);
+    final textColor = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
+
     return GestureDetector(
-      onTap: () => HapticFeedback.lightImpact(),
-      child: Container(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.of(context).pushNamed(
+          Pages.categoryFurniture,
+          arguments: item,
+        );
+      },
+      child: SizedBox(
         width: cardW,
-        height: cardH,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.black.withValues(alpha: isDark ? 0.3 : 0.10),
-              blurRadius: 10,
-              spreadRadius: -3,
-              offset: const Offset(0, 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: cardW,
+              height: cardW,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(cardW * 0.3),
+                color: bgColor,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(cardW * 0.3),
+                child: _buildImage(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              item.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.dmSans(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w500,
+                color: textColor,
+                height: 1.2,
+              ),
             ),
           ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              _buildImage(),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const [0.0, 0.45, 1.0],
-                    colors: [
-                      Colors.black.withValues(alpha: 0.08),
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.72),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 6,
-                right: 6,
-                bottom: 6,
-                child: Text(
-                  item.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.dmSans(
-                    fontSize: (cardW * 0.13).clamp(9.0, 12.0),
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    height: 1.2,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -150,31 +129,24 @@ class _CategoryCard extends StatelessWidget {
   Widget _buildImage() {
     final String? url = item.coverImage;
     if (url == null || url.isEmpty) {
-      return ColoredBox(
-        color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey200,
-        child: Center(
-          child: Icon(
-            Icons.category_outlined,
-            size: cardW * 0.3,
-            color: AppColors.grey400,
-          ),
+      return Center(
+        child: Icon(
+          Icons.category_outlined,
+          size: cardW * 0.35,
+          color: AppColors.grey400,
         ),
       );
     }
     return CachedNetworkImage(
       imageUrl: url,
+      memCacheWidth: 200,
       fit: BoxFit.cover,
-      placeholder: (_, __) => ColoredBox(
-        color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
-      ),
-      errorWidget: (_, __, ___) => ColoredBox(
-        color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey200,
-        child: Center(
-          child: Icon(
-            Icons.category_outlined,
-            size: cardW * 0.3,
-            color: AppColors.grey400,
-          ),
+      placeholder: (_, __) => const SizedBox.shrink(),
+      errorWidget: (_, __, ___) => Center(
+        child: Icon(
+          Icons.category_outlined,
+          size: cardW * 0.35,
+          color: AppColors.grey400,
         ),
       ),
     );

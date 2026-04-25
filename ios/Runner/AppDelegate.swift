@@ -3,20 +3,18 @@ import UIKit
 import FirebaseMessaging
 
 @main
-@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+@objc class AppDelegate: FlutterAppDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    // Register for remote notifications
+    GeneratedPluginRegistrant.register(with: self)
+    GlbToUsdzConverter.register(with: self.registrar(forPlugin: "GlbToUsdzConverter")!)
+
     UNUserNotificationCenter.current().delegate = self
     application.registerForRemoteNotifications()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-
-  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
-    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
 
   override func application(

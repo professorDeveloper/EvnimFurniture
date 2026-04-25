@@ -47,7 +47,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _nameFocus.dispose();
-    _authBloc.close();
     super.dispose();
   }
 
@@ -200,6 +199,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       imageWidget = ClipOval(
         child: CachedNetworkImage(
           imageUrl: widget.user.picture!,
+          memCacheWidth: 200,
           width: 90,
           height: 90,
           fit: BoxFit.cover,
@@ -305,8 +305,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocProvider.value(
-      value: _authBloc,
+    return BlocProvider(
+      create: (_) => _authBloc,
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is ProfileSaved) {

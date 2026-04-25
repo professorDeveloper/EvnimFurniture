@@ -1,69 +1,88 @@
 part of '../detail_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Image pane
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ImagePane extends StatelessWidget {
+class _ImagePane extends StatefulWidget {
   const _ImagePane({
     required this.items,
     required this.pageCtrl,
     required this.page,
-    required this.safeTop,
     required this.showing3d,
-    required this.modelViewerMounted,
     required this.has3dModel,
     required this.modelFile,
     required this.onPageChanged,
-    required this.on360Toggle,
-    required this.onFullscreen,
-    required this.overscroll,
+    this.on360,
+    this.onAr,
+    this.onExpand,
     this.onImageTap,
   });
 
   final List<String> items;
   final PageController pageCtrl;
   final int page;
-  final double safeTop;
   final bool showing3d;
-  final bool modelViewerMounted;
   final bool has3dModel;
   final String? modelFile;
   final ValueChanged<int> onPageChanged;
-  final VoidCallback on360Toggle;
-  final VoidCallback onFullscreen;
-  final double overscroll;
+  final VoidCallback? on360;
+  final VoidCallback? onAr;
+  final VoidCallback? onExpand;
   final ValueChanged<int>? onImageTap;
 
   @override
+  State<_ImagePane> createState() => _ImagePaneState();
+}
+
+class _ImagePaneState extends State<_ImagePane> {
+  bool _modelMounted = false;
+
+  @override
+  void didUpdateWidget(_ImagePane old) {
+    super.didUpdateWidget(old);
+    if (widget.showing3d && !_modelMounted && widget.has3dModel) {
+      setState(() => _modelMounted = true);
+    }
+    if (old.modelFile != widget.modelFile) {
+      setState(() => _modelMounted = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor =
+        isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF5F5F0);
+
     return Stack(
       fit: StackFit.expand,
       children: [
         Offstage(
-          offstage: showing3d,
-          child: PageView.builder(
-            controller: pageCtrl,
-            physics: const BouncingScrollPhysics(),
-            itemCount: items.isEmpty ? 1 : items.length,
-            onPageChanged: onPageChanged,
-            itemBuilder: (_, i) => items.isEmpty
-                ? const _ImgPlaceholder()
-                : GestureDetector(
-                    onTap: () => onImageTap?.call(i),
-                    child: _PageImage(url: items[i]),
-                  ),
-          ),
-        ),
-        if (modelViewerMounted && has3dModel)
-          Offstage(
-            offstage: !showing3d,
-            child: _KeepAliveModelViewer(
-              key: ValueKey(modelFile),
-              modelUrl: modelFile!,
+          offstage: widget.showing3d,
+          child: RepaintBoundary(
+            child: PageView.builder(
+              controller: widget.pageCtrl,
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.items.isEmpty ? 1 : widget.items.length,
+              onPageChanged: widget.onPageChanged,
+              itemBuilder: (_, i) => widget.items.isEmpty
+                  ? const _ImgPlaceholder()
+                  : GestureDetector(
+                      onTap: () => widget.onImageTap?.call(i),
+                      child: _PageImage(url: widget.items[i]),
+                    ),
             ),
           ),
-        if (!showing3d)
+        ),
+        if (widget.has3dModel && _modelMounted)
+          Offstage(
+            offstage: !widget.showing3d,
+            child: RepaintBoundary(
+              child: _InlineModelViewer(
+                key: ValueKey(widget.modelFile),
+                modelUrl: widget.modelFile!,
+                backgroundColor: bgColor,
+              ),
+            ),
+          ),
+        if (!widget.showing3d)
           Positioned.fill(
             child: IgnorePointer(
               child: DecoratedBox(
@@ -73,113 +92,110 @@ class _ImagePane extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withValues(alpha: 0.35),
+                      Colors.black.withValues(alpha: 0.3),
                     ],
-                    stops: const [0.38, 1.0],
+                    stops: const [0.45, 1.0],
                   ),
                 ),
               ),
             ),
           ),
-        if (!showing3d && items.length > 1)
+        if (!widget.showing3d && widget.items.length > 1)
           Positioned(
-            bottom: 78,
+            bottom: 64,
             left: 0,
             right: 0,
-            child: _PageDots(current: page, count: items.length),
+            child: _PageDots(current: widget.page, count: widget.items.length),
           ),
-        if (!showing3d)
+        if (widget.has3dModel)
           Positioned(
-            bottom: 38,
-            left: 14,
-            child: _CountPill(current: page + 1, total: items.length),
-          ),
-        Positioned(
-          bottom: 54,
-          right: 14,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (showing3d) ...[
-                _ViewToggleBtn(
-                  icon: Icons.photo_library_rounded,
-                  label: AppTexts.detailPhotos.tr(),
-                  onTap: on360Toggle,
-                ),
-                const SizedBox(width: 8),
-                _ViewToggleBtn(
-                  icon: Icons.open_in_full_rounded,
-                  label: AppTexts.detailExpand.tr(),
-                  onTap: onFullscreen,
-                ),
+            bottom: 44,
+            right: 14,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.showing3d) ...[
+                  _ViewBtn(
+                    icon: Icons.photo_library_outlined,
+                    label: AppTexts.detailPhotos.tr(),
+                    onTap: widget.on360 ?? () {},
+                  ),
+                  const SizedBox(width: 8),
+                  _ViewBtn(
+                    icon: Icons.open_in_full_rounded,
+                    label: AppTexts.detailExpand.tr(),
+                    onTap: widget.onExpand ?? () {},
+                  ),
+                ] else ...[
+                  _ViewBtn(
+                    icon: Icons.view_in_ar_rounded,
+                    label: 'AR',
+                    onTap: widget.onAr ?? () {},
+                  ),
+                  const SizedBox(width: 8),
+                  _ViewBtn(
+                    icon: Icons.rotate_90_degrees_ccw_rounded,
+                    label: '360°',
+                    onTap: widget.on360 ?? () {},
+                  ),
+                ],
               ],
-              if (!showing3d && has3dModel) ...[
-                _ViewToggleBtn(
-                  icon: Icons.view_in_ar_rounded,
-                  label: 'AR',
-                  onTap: () {},
-                ),
-                const SizedBox(width: 8),
-                _ViewToggleBtn(
-                  icon: Icons.rotate_90_degrees_ccw_rounded,
-                  label: '360°',
-                  onTap: on360Toggle,
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
         Positioned(
           bottom: 0,
           left: 0,
           right: 0,
           child: IgnorePointer(
             child: Container(
-              height: 30,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              height: 28,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : Colors.white,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
               ),
             ),
           ),
         ),
-        if (showing3d && overscroll > 10)
-          Positioned(
-            bottom: 44,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 150),
-                opacity: ((overscroll - 10) / 60).clamp(0.0, 1.0),
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.55),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      AppTexts.detailPullDownToExpand.tr(),
-                      style: GoogleFonts.dmSans(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }
 }
 
-class _ViewToggleBtn extends StatelessWidget {
-  const _ViewToggleBtn({
+class _InlineModelViewer extends StatefulWidget {
+  const _InlineModelViewer({
+    super.key,
+    required this.modelUrl,
+    required this.backgroundColor,
+  });
+
+  final String modelUrl;
+  final Color backgroundColor;
+
+  @override
+  State<_InlineModelViewer> createState() => _InlineModelViewerState();
+}
+
+class _InlineModelViewerState extends State<_InlineModelViewer>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return ModelViewer(
+      src: widget.modelUrl,
+      ar: false,
+      autoRotate: true,
+      cameraControls: true,
+      backgroundColor: widget.backgroundColor,
+    );
+  }
+}
+
+class _ViewBtn extends StatelessWidget {
+  const _ViewBtn({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -194,66 +210,31 @@ class _ViewToggleBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 34,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: 11),
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.52),
-          borderRadius: BorderRadius.circular(17),
+          color: Colors.black.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.18),
+            color: Colors.white.withValues(alpha: 0.15),
             width: 0.8,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.22),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 15, color: Colors.white),
+            Icon(icon, size: 14, color: Colors.white),
             const SizedBox(width: 5),
             Text(
               label,
               style: GoogleFonts.dmSans(
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
-                letterSpacing: -0.1,
                 height: 1.0,
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CountPill extends StatelessWidget {
-  const _CountPill({required this.current, required this.total});
-
-  final int current;
-  final int total;
-
-  @override
-  Widget build(BuildContext context) {
-    if (total <= 1) return const SizedBox.shrink();
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        '$current / $total',
-        style: GoogleFonts.dmSans(
-          fontSize: 12,
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -268,10 +249,14 @@ class _PageImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (url.isEmpty) return const _ImgPlaceholder();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return CachedNetworkImage(
       imageUrl: url,
+      memCacheWidth: 800,
       fit: BoxFit.cover,
-      placeholder: (_, __) => const ColoredBox(color: AppColors.grey100),
+      placeholder: (_, __) => ColoredBox(
+        color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey100,
+      ),
       errorWidget: (_, __, ___) => const _ImgPlaceholder(),
     );
   }
@@ -285,20 +270,20 @@ class _PageDots extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final visible = count.clamp(0, 12);
+    if (visible <= 1) return const SizedBox.shrink();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(count, (i) {
+      children: List.generate(visible, (i) {
         final active = i == current;
         return AnimatedContainer(
-          duration: const Duration(milliseconds: 240),
+          duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: active ? 20 : 6,
-          height: 6,
+          margin: const EdgeInsets.symmetric(horizontal: 2.5),
+          width: active ? 18 : 5,
+          height: 5,
           decoration: BoxDecoration(
-            color: active
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.45),
+            color: active ? Colors.white : Colors.white.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(3),
           ),
         );

@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 
+import 'package:easy_localization/easy_localization.dart';
+import '../../../../core/constants/app_texts.dart';
 import '../../domain/model/story_item.dart';
 
 class StoryViewerScreen extends StatefulWidget {
@@ -89,7 +91,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                       color: Colors.white54, size: 48),
                   const SizedBox(height: 8),
                   Text(
-                    'Video xatolik',
+                    AppTexts.videoError.tr(),
                     style:
                         TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                   ),
@@ -137,8 +139,9 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   void _goToNext() {
     if (_index < widget.items.length - 1) {
       _index++;
-      _loadCurrentMedia();
-      _startTimer();
+      _loadCurrentMedia().then((_) {
+        if (mounted) _startTimer();
+      });
       if (mounted) setState(() {});
     } else {
       Navigator.of(context).pop();
@@ -148,8 +151,9 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   void _goToPrev() {
     if (_index > 0) {
       _index--;
-      _loadCurrentMedia();
-      _startTimer();
+      _loadCurrentMedia().then((_) {
+        if (mounted) _startTimer();
+      });
       if (mounted) setState(() {});
     } else {
       _progressController.reset();
@@ -169,10 +173,10 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     final now = DateTime.now();
     final diff = now.difference(date);
 
-    if (diff.inMinutes < 1) return 'hozir';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} daqiqa oldin';
-    if (diff.inHours < 24) return '${diff.inHours} soat oldin';
-    if (diff.inDays < 7) return '${diff.inDays} kun oldin';
+    if (diff.inMinutes < 1) return AppTexts.timeNow.tr();
+    if (diff.inMinutes < 60) return AppTexts.timeMinutesAgo.tr(args: ['${diff.inMinutes}']);
+    if (diff.inHours < 24) return AppTexts.timeHoursAgo.tr(args: ['${diff.inHours}']);
+    if (diff.inDays < 7) return AppTexts.timeDaysAgo.tr(args: ['${diff.inDays}']);
     return '${date.day}/${date.month}/${date.year}';
   }
 
@@ -231,7 +235,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
               const Icon(Icons.videocam_off, color: Colors.white54, size: 64),
               const SizedBox(height: 16),
               Text(
-                'Video yuklanmadi',
+                AppTexts.videoLoadFailed.tr(),
                 style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               ),
             ],
@@ -244,6 +248,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     return CachedNetworkImage(
       key: ValueKey(_current.id),
       imageUrl: _current.mediaUrl,
+      memCacheWidth: 800,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,

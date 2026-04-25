@@ -9,4 +9,11 @@ class Pages {
   static const String home = '/home';
   static const String editProfile = '/editProfile';
   static const String notifications = '/notifications';
+  static const String help = '/help';
+  static const String viewAll = '/view-all';
+  static const String categoryFurniture = '/category-furniture';
+  static const String categoriesViewAll = '/categories-view-all';
+  static const String legalInfo = '/legal-info';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String serviceTerms = '/service-terms';
 }

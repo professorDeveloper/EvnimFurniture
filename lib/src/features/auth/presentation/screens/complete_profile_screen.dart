@@ -45,7 +45,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _nameFocus.dispose();
-    _authBloc.close();
     super.dispose();
   }
 
@@ -205,8 +204,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocProvider.value(
-      value: _authBloc,
+    return BlocProvider(
+      create: (_) => _authBloc,
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is ProfileSaved) {

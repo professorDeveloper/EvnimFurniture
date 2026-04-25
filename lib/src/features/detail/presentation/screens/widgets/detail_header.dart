@@ -1,91 +1,5 @@
 part of '../detail_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Floating header
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _FloatingHeader extends StatelessWidget {
-  const _FloatingHeader({
-    required this.isCollapsed,
-    required this.safeTop,
-    required this.title,
-    required this.isFav,
-    required this.isDark,
-    required this.onBack,
-    required this.onFav,
-  });
-
-  final bool isCollapsed;
-  final double safeTop;
-  final String title;
-  final bool isFav;
-  final bool isDark;
-  final VoidCallback onBack;
-  final VoidCallback onFav;
-
-  @override
-  Widget build(BuildContext context) {
-    final collapsedBg = isDark ? AppColors.darkSurface : Colors.white;
-    final titleColor =
-        isDark ? AppColors.darkOnSurface : AppColors.onSurface;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOut,
-      decoration: BoxDecoration(
-        color: isCollapsed ? collapsedBg : Colors.transparent,
-        boxShadow: isCollapsed
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.07),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
-      ),
-      height: safeTop + 52,
-      padding: EdgeInsets.only(top: safeTop, left: 6, right: 6),
-      child: Row(
-        children: [
-          _HBtn(
-            icon: Icons.arrow_back_ios_new_rounded,
-            onTap: onBack,
-            collapsed: isCollapsed,
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 220),
-              opacity: isCollapsed ? 1.0 : 0.0,
-              child: Text(
-                title,
-                style: GoogleFonts.dmSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                  letterSpacing: -0.3,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          _LikeBtn(
-            isFav: isFav,
-            onTap: onFav,
-            collapsed: isCollapsed,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Header icon button
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _HBtn extends StatelessWidget {
   const _HBtn({
     required this.icon,
@@ -99,39 +13,30 @@ class _HBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final collapsedColor =
+        isDark ? AppColors.darkOnSurface : AppColors.onSurface;
+
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 42,
-        height: 42,
+        width: 36,
+        height: 36,
         child: collapsed
-            ? Icon(icon, size: 20, color: AppColors.onSurface)
-            : ClipOval(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.22),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.45),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Icon(icon, size: 20, color: Colors.white),
-                  ),
+            ? Center(child: Icon(icon, size: 20, color: collapsedColor))
+            : Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(icon, size: 18, color: Colors.white),
               ),
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Animated like button
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _LikeBtn extends StatefulWidget {
   const _LikeBtn({
@@ -150,8 +55,8 @@ class _LikeBtn extends StatefulWidget {
 
 class _LikeBtnState extends State<_LikeBtn>
     with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _scale;
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
 
   @override
   void initState() {
@@ -162,17 +67,20 @@ class _LikeBtnState extends State<_LikeBtn>
     );
     _scale = TweenSequence<double>([
       TweenSequenceItem(
-          tween: Tween(begin: 1.0, end: 1.35)
-              .chain(CurveTween(curve: Curves.easeOut)),
-          weight: 35),
+        tween: Tween(begin: 1.0, end: 1.3)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 35,
+      ),
       TweenSequenceItem(
-          tween: Tween(begin: 1.35, end: 0.85)
-              .chain(CurveTween(curve: Curves.easeIn)),
-          weight: 25),
+        tween: Tween(begin: 1.3, end: 0.88)
+            .chain(CurveTween(curve: Curves.easeIn)),
+        weight: 25,
+      ),
       TweenSequenceItem(
-          tween: Tween(begin: 0.85, end: 1.0)
-              .chain(CurveTween(curve: Curves.elasticOut)),
-          weight: 40),
+        tween: Tween(begin: 0.88, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 40,
+      ),
     ]).animate(_ctrl);
   }
 
@@ -192,18 +100,19 @@ class _LikeBtnState extends State<_LikeBtn>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final collapsedColor =
+        isDark ? AppColors.darkOnSurface : AppColors.onSurface;
     final iconColor = widget.isFav
         ? const Color(0xFFE53935)
-        : (widget.collapsed ? AppColors.onSurface : Colors.white);
+        : (widget.collapsed ? collapsedColor : Colors.white);
 
     final icon = AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       transitionBuilder: (child, anim) =>
           ScaleTransition(scale: anim, child: child),
       child: Icon(
-        widget.isFav
-            ? Icons.favorite_rounded
-            : Icons.favorite_border_rounded,
+        widget.isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
         key: ValueKey(widget.isFav),
         size: 21,
         color: iconColor,
@@ -214,31 +123,20 @@ class _LikeBtnState extends State<_LikeBtn>
       onTap: widget.onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 42,
-        height: 42,
+        width: 36,
+        height: 36,
         child: widget.collapsed
             ? Center(child: ScaleTransition(scale: _scale, child: icon))
-            : ClipOval(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    decoration: BoxDecoration(
-                      color: widget.isFav
-                          ? const Color(0xFFE53935).withValues(alpha: 0.28)
-                          : Colors.white.withValues(alpha: 0.22),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: widget.isFav
-                            ? const Color(0xFFE53935).withValues(alpha: 0.5)
-                            : Colors.white.withValues(alpha: 0.45),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Center(
-                      child: ScaleTransition(scale: _scale, child: icon),
-                    ),
-                  ),
+            : Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: widget.isFav
+                      ? const Color(0xFFE53935).withValues(alpha: 0.55)
+                      : Colors.black.withValues(alpha: 0.45),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: ScaleTransition(scale: _scale, child: icon),
                 ),
               ),
       ),

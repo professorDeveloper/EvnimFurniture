@@ -21,10 +21,8 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupDi();
 
-  // Initialize notification service (no permission prompt)
   await NotificationService.instance.init();
 
-  // If user logged in + permission already granted, register token silently
   if (FirebaseAuth.instance.currentUser != null &&
       NotificationService.instance.isPermissionGranted) {
     NotificationService.instance.registerToken();

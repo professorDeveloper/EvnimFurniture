@@ -4,14 +4,20 @@ class Assets {
 
   static const String iconsAppIcon = 'assets/icons/app_icon.svg';
   static const String iconsAppbarIcon = 'assets/icons/appbar_icon.svg';
+  static const String iconsApple = 'assets/icons/apple.svg';
+  static const String iconsGoogle = 'assets/icons/google.svg';
   static const String iconsIcRussian = 'assets/icons/ic_russian.png';
   static const String iconsIcUk = 'assets/icons/ic_uk.png';
   static const String iconsIcUzbek = 'assets/icons/ic_uzbek.png';
   static const String imagesAppLogo = 'assets/images/app_logo.png';
+  static const String imagesFacebook = 'assets/images/facebook.png';
+  static const String imagesInstagram = 'assets/images/instagram.png';
   static const String imagesIntroOne = 'assets/images/introOne.svg';
   static const String imagesIntroThree = 'assets/images/introThree.svg';
   static const String imagesIntroTwo = 'assets/images/introTwo.svg';
   static const String imagesLoginImg = 'assets/images/login_img.jpg';
+  static const String imagesPhone = 'assets/images/phone.png';
+  static const String imagesTelegram = 'assets/images/telegram.png';
   static const String translationsEn = 'assets/translations/en.json';
   static const String translationsRu = 'assets/translations/ru.json';
   static const String translationsUz = 'assets/translations/uz.json';

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_texts.dart';
 import '../../../../core/di/injection.dart';
 import '../../domain/model/notification_item.dart';
 import '../bloc/notification_bloc.dart';
@@ -117,6 +118,7 @@ class _NotificationList extends StatelessWidget {
               );
             }
             return _NotificationCard(
+              key: ValueKey(state.items[index].id),
               item: state.items[index],
               isDark: isDark,
             );
@@ -128,7 +130,7 @@ class _NotificationList extends StatelessWidget {
 }
 
 class _NotificationCard extends StatelessWidget {
-  const _NotificationCard({required this.item, required this.isDark});
+  const _NotificationCard({super.key, required this.item, required this.isDark});
 
   final NotificationItem item;
   final bool isDark;
@@ -158,6 +160,7 @@ class _NotificationCard extends StatelessWidget {
           if (hasImage)
             CachedNetworkImage(
               imageUrl: item.image!,
+              memCacheWidth: 800,
               width: double.infinity,
               height: 160,
               fit: BoxFit.cover,
@@ -223,10 +226,10 @@ class _NotificationCard extends StatelessWidget {
     final now = DateTime.now();
     final diff = now.difference(dt);
 
-    if (diff.inMinutes < 1) return 'Hozir';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} min oldin';
-    if (diff.inHours < 24) return '${diff.inHours} soat oldin';
-    if (diff.inDays < 7) return '${diff.inDays} kun oldin';
+    if (diff.inMinutes < 1) return AppTexts.timeNow.tr();
+    if (diff.inMinutes < 60) return AppTexts.timeMinutesAgo.tr(args: ['${diff.inMinutes}']);
+    if (diff.inHours < 24) return AppTexts.timeHoursAgo.tr(args: ['${diff.inHours}']);
+    if (diff.inDays < 7) return AppTexts.timeDaysAgo.tr(args: ['${diff.inDays}']);
 
     return '${dt.day.toString().padLeft(2, '0')}.'
         '${dt.month.toString().padLeft(2, '0')}.'
@@ -234,31 +237,107 @@ class _NotificationCard extends StatelessWidget {
   }
 }
 
-class _EmptyState extends StatelessWidget {
+class _EmptyState extends StatefulWidget {
   const _EmptyState({required this.isDark});
   final bool isDark;
 
   @override
+  State<_EmptyState> createState() => _EmptyStateState();
+}
+
+class _EmptyStateState extends State<_EmptyState>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _pulseAnim;
+  late final Animation<double> _fadeAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    _pulseAnim = Tween<double>(begin: 0.95, end: 1.05).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+
+    _fadeAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final iconBg = widget.isDark
+        ? AppColors.darkSurfaceVariant
+        : AppColors.primary.withValues(alpha: 0.08);
+    final iconColor = widget.isDark
+        ? AppColors.grey500
+        : AppColors.primary.withValues(alpha: 0.7);
+
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.notifications_none_rounded,
-            size: 56,
-            color: isDark ? AppColors.grey600 : AppColors.grey300,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'noNotifications'.tr(),
-            style: GoogleFonts.dmSans(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.grey500 : AppColors.grey400,
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedBuilder(
+              animation: _ctrl,
+              builder: (context, child) {
+                return ScaleTransition(
+                  scale: _pulseAnim,
+                  child: FadeTransition(
+                    opacity: _fadeAnim,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: iconBg,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.notifications_none_rounded,
+                        size: 48,
+                        color: iconColor,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Text(
+              'noNotifications'.tr(),
+              style: GoogleFonts.dmSans(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: widget.isDark
+                    ? AppColors.darkOnSurface
+                    : AppColors.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'noNotificationsDesc'.tr(),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                color: widget.isDark
+                    ? AppColors.grey500
+                    : AppColors.grey600,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

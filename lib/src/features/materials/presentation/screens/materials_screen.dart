@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_texts.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/router/pages.dart';
 import '../../../home/domain/model/material_item.dart' as home;
@@ -264,53 +265,17 @@ class _MaterialsScreenState extends State<MaterialsScreen> {
   }
 
   Widget _buildError(String message, bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline_rounded,
-              size: 44,
-              color: isDark ? AppColors.grey600 : AppColors.grey300),
-          const SizedBox(height: 16),
-          TextButton(
-            onPressed: () => context.read<MaterialsBloc>().add(
-              MaterialsFetched(
-                search: _searchController.text.isEmpty
-                    ? null
-                    : _searchController.text,
-              ),
-            ),
-            child: Text(
-              AppTexts.materialSheetRetry.tr(),
-              style: GoogleFonts.dmSans(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return AppErrorState(
+      onRetry: () => context.read<MaterialsBloc>().add(MaterialsFetched()),
+      isDark: isDark,
     );
   }
 
   Widget _buildEmpty(bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.texture_rounded,
-              size: 44,
-              color: isDark ? AppColors.grey600 : AppColors.grey300),
-          const SizedBox(height: 12),
-          Text(
-            AppTexts.materialSheetEmpty.tr(),
-            style: GoogleFonts.dmSans(
-              fontSize: 13,
-              color: AppColors.grey500,
-            ),
-          ),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.texture_rounded,
+      title: AppTexts.materialSheetEmpty.tr(),
+      isDark: isDark,
     );
   }
 }

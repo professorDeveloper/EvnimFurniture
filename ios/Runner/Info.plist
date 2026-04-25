@@ -48,6 +48,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoadsInWebContent</key>
+      <true/>
+    </dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -55,11 +60,11 @@
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSCameraUsageDescription</key>
-    <string>Profil rasmi olish uchun</string>
+    <string>Camera is used for AR furniture placement and profile photo</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Profil rasmini tanlash uchun</string>
+    <string>Photo library access is needed to select a profile photo</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>AI natijasini galereyaga saqlash uchun</string>
+    <string>Save AR and AI results to your photo library</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -74,4 +79,5 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
+
 </plist>

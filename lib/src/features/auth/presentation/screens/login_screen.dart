@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen>
     _phoneController.dispose();
     _phoneFocus.dispose();
     _animController.dispose();
-    _authBloc.close();
     super.dispose();
   }
 
@@ -180,8 +179,8 @@ class _LoginScreenState extends State<LoginScreen>
     final isIOS = Platform.isIOS;
     final isSmall = size.height < 700;
 
-    return BlocProvider.value(
-      value: _authBloc,
+    return BlocProvider(
+      create: (_) => _authBloc,
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is OtpSent) {

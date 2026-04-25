@@ -207,6 +207,36 @@ class FurnitureMaterialColorsResponse {
 
   bool get has3dModel => modelFile != null && modelFile!.isNotEmpty;
 
+  FurnitureMaterialColorsResponse copyWithStats({
+    double? avgRating,
+    int? ratingCount,
+  }) {
+    return FurnitureMaterialColorsResponse(
+      furnitureMaterialId: furnitureMaterialId,
+      modelFile: modelFile,
+      furniture: FMCFurniture(
+        id: furniture.id,
+        name: furniture.name,
+        description: furniture.description,
+        thumbnailImage: furniture.thumbnailImage,
+        images: furniture.images,
+        tags: furniture.tags,
+        stats: FMCStats(
+          avgRating: avgRating ?? furniture.stats.avgRating,
+          ratingCount: ratingCount ?? furniture.stats.ratingCount,
+          viewCount: furniture.stats.viewCount,
+        ),
+      ),
+      material: material,
+      colors: colors,
+      defaultColor: defaultColor,
+      colorCount: colorCount,
+      isFavorited: isFavorited,
+      myRating: myRating,
+      otherMaterials: otherMaterials,
+    );
+  }
+
   factory FurnitureMaterialColorsResponse.fromJson(
       Map<String, dynamic> json) {
     final raw = (json['data'] as Map<String, dynamic>?) ?? json;

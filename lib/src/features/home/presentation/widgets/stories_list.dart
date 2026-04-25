@@ -113,6 +113,7 @@ class _StoryCell extends StatelessWidget {
                 child: ClipOval(
                   child: CachedNetworkImage(
                     imageUrl: item.displayImage,
+                    memCacheWidth: 200,
                     fit: BoxFit.cover,
                     placeholder: (_, __) => ColoredBox(
                       color: isDark
