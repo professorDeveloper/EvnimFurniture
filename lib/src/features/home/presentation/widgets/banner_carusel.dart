@@ -127,13 +127,15 @@ class _BannerImage extends StatelessWidget {
   final double horizontalPadding;
 
   void _openDetail(BuildContext context) {
-    if (banner.furnitureMaterialId == null || banner.furnitureMaterialId!.isEmpty) return;
+    if (!banner.hasLink) return;
     HapticFeedback.lightImpact();
+
+    final materialId = banner.furnitureCombinationId ?? banner.furnitureMaterialId;
     Navigator.of(context).pushNamed(
       Pages.furnitureDetail,
       arguments: {
         'furnitureId': '',
-        'furnitureMaterialId': banner.furnitureMaterialId,
+        'furnitureMaterialId': materialId,
       },
     );
   }
@@ -142,7 +144,7 @@ class _BannerImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final placeholderColor = isDark ? AppColors.darkSurfaceVariant : AppColors.grey100;
-    final hasLink = banner.furnitureMaterialId != null && banner.furnitureMaterialId!.isNotEmpty;
+    final hasLink = banner.hasLink;
 
     return GestureDetector(
       onTap: () => _openDetail(context),

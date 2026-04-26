@@ -53,6 +53,7 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
                 id: banner.id,
                 imageUrl: banner.image,
                 furnitureMaterialId: banner.furnitureMaterialId,
+                furnitureCombinationId: banner.furnitureCombinationId,
                 order: banner.order,
               ))
           .toList();
