@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NativeArScreen extends StatefulWidget {
   const NativeArScreen({
@@ -23,11 +24,31 @@ class _NativeArScreenState extends State<NativeArScreen> {
   static const _arChannel = MethodChannel('com.evim/ar');
   static bool _arOpening = false;
 
+  bool _cameraGranted = false;
+  bool _cameraChecked = false;
+
   @override
   void initState() {
     super.initState();
     if (Platform.isIOS) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _openIOSAR());
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkCameraPermission());
+    }
+  }
+
+  Future<void> _checkCameraPermission() async {
+    final status = await Permission.camera.status;
+    if (status.isGranted) {
+      if (mounted) setState(() { _cameraGranted = true; _cameraChecked = true; });
+      return;
+    }
+    final result = await Permission.camera.request();
+    if (mounted) {
+      setState(() {
+        _cameraGranted = result.isGranted;
+        _cameraChecked = true;
+      });
     }
   }
 
@@ -52,9 +73,7 @@ class _NativeArScreenState extends State<NativeArScreen> {
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF5F5F0),
-      );
+      return const Scaffold(backgroundColor: Color(0xFFF5F5F0));
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -68,19 +87,24 @@ class _NativeArScreenState extends State<NativeArScreen> {
         backgroundColor: bgColor,
         body: Stack(
           children: [
-            Positioned.fill(
-              child: ModelViewer(
-                src: widget.modelUrl,
-                ar: true,
-                arModes: const ['scene-viewer', 'webxr', 'quick-look'],
-                arScale: ArScale.auto,
-                autoRotate: true,
-                cameraControls: true,
-                shadowIntensity: 1,
-                backgroundColor: bgColor,
-                interactionPrompt: InteractionPrompt.none,
+            if (!_cameraChecked)
+              const Center(child: CircularProgressIndicator())
+            else if (!_cameraGranted)
+              _CameraPermissionDenied(isDark: isDark, textColor: textColor, bgColor: bgColor)
+            else
+              Positioned.fill(
+                child: ModelViewer(
+                  src: widget.modelUrl,
+                  ar: true,
+                  arModes: const ['scene-viewer', 'webxr'],
+                  arScale: ArScale.auto,
+                  autoRotate: true,
+                  cameraControls: true,
+                  shadowIntensity: 1,
+                  backgroundColor: bgColor,
+                  interactionPrompt: InteractionPrompt.none,
+                ),
               ),
-            ),
             Positioned(
               top: safeTop + 8,
               left: 16,
@@ -93,14 +117,50 @@ class _NativeArScreenState extends State<NativeArScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: (isDark ? Colors.white : Colors.black)
-                        .withValues(alpha: 0.08),
+                    color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.arrow_back_ios_new_rounded,
-                      size: 18, color: textColor),
+                  child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: textColor),
                 ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CameraPermissionDenied extends StatelessWidget {
+  const _CameraPermissionDenied({
+    required this.isDark,
+    required this.textColor,
+    required this.bgColor,
+  });
+
+  final bool isDark;
+  final Color textColor;
+  final Color bgColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.no_photography_outlined, size: 64, color: textColor.withValues(alpha: 0.4)),
+            const SizedBox(height: 16),
+            Text(
+              'Camera permission is required for AR',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: textColor, fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: openAppSettings,
+              child: const Text('Open Settings'),
             ),
           ],
         ),

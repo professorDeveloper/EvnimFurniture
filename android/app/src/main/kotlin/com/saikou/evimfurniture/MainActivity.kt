@@ -1,4 +1,4 @@
-package com.saikou.evim_furniture
+package com.saikou.evimfurniture
 
 import io.flutter.embedding.android.FlutterActivity
 
