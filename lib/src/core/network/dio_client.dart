@@ -6,7 +6,7 @@ class DioClient {
   DioClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://api.evimfurniture.uz/',
+        baseUrl: 'https://fuel-customers-bell-ordinary.trycloudflare.com/',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         contentType: 'application/json',

@@ -285,6 +285,12 @@ class _DetailViewState extends State<_DetailView> {
     final colors = data.colors;
     final colorIdx =
         _colorIdx.clamp(0, colors.isEmpty ? 0 : colors.length - 1);
+    final selectedColor = colors.isNotEmpty ? colors[colorIdx] : null;
+    final colorHex = (selectedColor != null &&
+            !selectedColor.isDefault &&
+            selectedColor.hexCode.isNotEmpty)
+        ? selectedColor.hexCode
+        : null;
     final items = _pageItems(data);
     final bg = isDark ? AppColors.darkSurface : Colors.white;
     final titleColor = isDark ? AppColors.darkOnSurface : AppColors.onSurface;
@@ -358,6 +364,7 @@ class _DetailViewState extends State<_DetailView> {
                 showing3d: _showing3d,
                 has3dModel: data.has3dModel,
                 modelFile: data.modelFile,
+                colorHex: colorHex,
                 onPageChanged: (p) => setState(() => _page = p),
                 on360: data.has3dModel ? _toggle3d : null,
                 onAr: data.has3dModel

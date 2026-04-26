@@ -78,6 +78,7 @@ class DetailRemoteDataSourceImpl implements DetailRemoteDataSource {
     required String roomImagePath,
     required String furnitureImageUrl,
   }) async {
+    // 1. Download furniture image
     Uint8List furnitureBytes = Uint8List(0);
     if (furnitureImageUrl.isNotEmpty) {
       final res = await dio_pkg.Dio().get<List<int>>(
@@ -98,22 +99,46 @@ class DetailRemoteDataSourceImpl implements DetailRemoteDataSource {
       ),
     });
 
-    final response = await dioClient.dio.post<Map<String, dynamic>>(
+    // 2. POST — darhol jobId qaytaradi
+    final startRes = await dioClient.dio.post<Map<String, dynamic>>(
       '/api/ai-image/place-furniture',
       data: formData,
       options: dio_pkg.Options(
         contentType: 'multipart/form-data',
-        receiveTimeout: const Duration(seconds: 120),
-        sendTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 35),
+        sendTimeout: const Duration(seconds: 35),
       ),
     );
 
-    final base64Image =
-        (response.data?['data']?['image'] as String?) ?? '';
-    if (base64Image.isEmpty) {
-      throw Exception('empty_result');
+    final jobId = (startRes.data?['jobId'] as String?) ?? '';
+    if (jobId.isEmpty) throw Exception('no_job_id');
+
+    // 3. Har 3 sekundda polling, max 30 sekund
+    final deadline = DateTime.now().add(const Duration(seconds: 60));
+    while (DateTime.now().isBefore(deadline)) {
+      await Future.delayed(const Duration(seconds: 3));
+
+      final pollRes = await dioClient.dio.get<Map<String, dynamic>>(
+        '/api/ai-image/place-furniture/$jobId',
+      );
+
+      final data = pollRes.data;
+      final success = data?['success'] as bool? ?? false;
+      final status = data?['status'] as String? ?? '';
+
+      if (!success || status == 'error') {
+        throw Exception(data?['message'] as String? ?? 'ai_error');
+      }
+
+      if (status == 'done') {
+        final base64Image = (data?['data']?['image'] as String?) ?? '';
+        if (base64Image.isEmpty) throw Exception('empty_result');
+        return base64Image;
+      }
+      // status == 'processing' → davom etadi
     }
-    return base64Image;
+
+    throw Exception('timeout');
   }
 
   @override

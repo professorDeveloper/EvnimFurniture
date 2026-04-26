@@ -9,6 +9,7 @@ class _ImagePane extends StatefulWidget {
     required this.has3dModel,
     required this.modelFile,
     required this.onPageChanged,
+    this.colorHex,
     this.on360,
     this.onAr,
     this.onExpand,
@@ -21,6 +22,7 @@ class _ImagePane extends StatefulWidget {
   final bool showing3d;
   final bool has3dModel;
   final String? modelFile;
+  final String? colorHex;
   final ValueChanged<int> onPageChanged;
   final VoidCallback? on360;
   final VoidCallback? onAr;
@@ -76,9 +78,10 @@ class _ImagePaneState extends State<_ImagePane> {
             offstage: !widget.showing3d,
             child: RepaintBoundary(
               child: _InlineModelViewer(
-                key: ValueKey(widget.modelFile),
+                key: ValueKey('${widget.modelFile}_${widget.colorHex ?? ''}'),
                 modelUrl: widget.modelFile!,
                 backgroundColor: bgColor,
+                colorHex: widget.colorHex,
               ),
             ),
           ),
@@ -167,10 +170,12 @@ class _InlineModelViewer extends StatefulWidget {
     super.key,
     required this.modelUrl,
     required this.backgroundColor,
+    this.colorHex,
   });
 
   final String modelUrl;
   final Color backgroundColor;
+  final String? colorHex;
 
   @override
   State<_InlineModelViewer> createState() => _InlineModelViewerState();
@@ -181,6 +186,21 @@ class _InlineModelViewerState extends State<_InlineModelViewer>
   @override
   bool get wantKeepAlive => true;
 
+  String? _buildColorJs() {
+    final hex = widget.colorHex;
+    if (hex == null || hex.isEmpty) return null;
+    final cleanHex = '#${hex.replaceFirst('#', '')}';
+    return '''
+const mv = document.querySelector('model-viewer');
+mv.addEventListener('load', () => {
+  try {
+    const [mat] = mv.model.materials;
+    mat.pbrMetallicRoughness.setBaseColorFactor('$cleanHex');
+  } catch(e) {}
+});
+''';
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -190,6 +210,7 @@ class _InlineModelViewerState extends State<_InlineModelViewer>
       autoRotate: true,
       cameraControls: true,
       backgroundColor: widget.backgroundColor,
+      relatedJs: _buildColorJs(),
     );
   }
 }

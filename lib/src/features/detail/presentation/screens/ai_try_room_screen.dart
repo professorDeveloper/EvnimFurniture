@@ -27,6 +27,7 @@ class _AiTryRoomScreenState extends State<AiTryRoomScreen> {
   double _progress = 0;
   Timer? _progressTimer;
   int _currentStep = 0;
+  DateTime _startTime = DateTime.now();
 
   @override
   void dispose() {
@@ -37,10 +38,12 @@ class _AiTryRoomScreenState extends State<AiTryRoomScreen> {
   void _startProgress() {
     _progress = 0;
     _currentStep = 0;
+    _startTime = DateTime.now();
     _progressTimer = Timer.periodic(const Duration(milliseconds: 200), (t) {
       if (!mounted) { t.cancel(); return; }
       setState(() {
-        if (_progress < 0.9) _progress += 0.012 + (0.9 - _progress) * 0.006;
+        final elapsed = DateTime.now().difference(_startTime).inMilliseconds;
+        _progress = (elapsed / 60000.0).clamp(0.0, 0.95);
         if (_progress > 0.15 && _currentStep == 0) _currentStep = 1;
         if (_progress > 0.4 && _currentStep == 1) _currentStep = 2;
         if (_progress > 0.7 && _currentStep == 2) _currentStep = 3;
