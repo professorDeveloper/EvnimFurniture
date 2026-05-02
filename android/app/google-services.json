@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:140320585865:android:627f8433e856e46ebcae58",
+        "mobilesdk_app_id": "1:140320585865:android:83477c6269898353bcae58",
         "android_client_info": {
-          "package_name": "com.saikou.evim_furniture"
+          "package_name": "com.saikou.evimfurniture"
         }
       },
       "oauth_client": [
         {
-          "client_id": "140320585865-1be7k2223bhf8pvkv4cl5bn8o37olqol.apps.googleusercontent.com",
+          "client_id": "140320585865-bnguo464h4rkv7kumpavakgtsks5nb7l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.saikou.evim_furniture",
+            "package_name": "com.saikou.evimfurniture",
             "certificate_hash": "4d03bbdb6be6b8ad0b98b08f896da2b1dd7fc75f"
           }
         },

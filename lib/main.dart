@@ -1,4 +1,3 @@
-import 'package:bugsnag_flutter/bugsnag_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:evim_furniture/src/core/di/injection.dart';
 import 'package:evim_furniture/src/core/router/app_router.dart';
@@ -16,7 +15,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await EasyLocalization.ensureInitialized();
-  await bugsnag.start(apiKey: '9eea7bfa5d04d84c34f5d1525a9d1189');
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await setupDi();
