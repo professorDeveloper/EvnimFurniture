@@ -201,9 +201,19 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             );
           } else if (state is SocialLoginSuccess) {
-            if (state.isNewUser && !state.user.profileCompleted) {
+            if (!state.user.profileCompleted) {
+              final isApple = state.user.provider == 'apple';
+              final name = isApple
+                  ? (state.appleDisplayName ??
+                      state.user.name ??
+                      state.user.email?.split('@').first ??
+                      'User')
+                  : state.user.name;
               Navigator.pushNamed(context, Pages.completeProfile,
-                  arguments: state.user.name);
+                  arguments: {
+                    'name': name,
+                    'hideNameField': isApple,
+                  });
             } else {
               Navigator.pushNamedAndRemoveUntil(
                 context,

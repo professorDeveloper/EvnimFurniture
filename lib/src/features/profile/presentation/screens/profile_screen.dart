@@ -473,6 +473,7 @@ class _ProfileBody extends StatelessWidget {
       );
     }
 
+
     final themeTrailing = themeController.mode == ThemeMode.dark
         ? 'theme_dark'.tr()
         : 'theme_light'.tr();
@@ -611,7 +612,7 @@ class _ProfileBody extends StatelessWidget {
                 const SizedBox(height: 14),
               ],
 
-              // Logout button (only when logged in)
+              // Logout + Delete Account buttons (only when logged in)
               BlocConsumer<AuthBloc, AuthState>(
                 listener: (context, state) {
                   if (state is LoggedOut) {
@@ -624,26 +625,54 @@ class _ProfileBody extends StatelessWidget {
                 },
                 builder: (context, state) {
                   if (state is UserLoaded) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: card,
-                          borderRadius: BorderRadius.circular(radius),
-                          border: Border.all(color: border),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(radius),
-                          child: profileItem(
-                            icon: Icons.logout_rounded,
-                            title: 'logout'.tr(),
-                            onTap: () => _showLogoutDialog(context),
-                            isLast: true,
-                            iconColor: AppColors.error,
-                            titleColor: AppColors.error,
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: card,
+                              borderRadius: BorderRadius.circular(radius),
+                              border: Border.all(color: border),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(radius),
+                              child: profileItem(
+                                icon: Icons.logout_rounded,
+                                title: 'logout'.tr(),
+                                onTap: () => _showLogoutDialog(context),
+                                isLast: true,
+                                iconColor: AppColors.error,
+                                titleColor: AppColors.error,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: card,
+                              borderRadius: BorderRadius.circular(radius),
+                              border: Border.all(color: border),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(radius),
+                              child: profileItem(
+                                icon: Icons.person_remove_outlined,
+                                title: AppTexts.deleteAccount.tr(),
+                                onTap: () => Navigator.pushNamed(
+                                    context, Pages.deleteAccount,
+                                    arguments: state.user),
+                                isLast: true,
+                                iconColor: AppColors.error,
+                                titleColor: AppColors.error,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   }
                   return const SizedBox.shrink();

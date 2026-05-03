@@ -66,3 +66,21 @@ class EditProfileEvent extends AuthEvent {
 class LogoutEvent extends AuthEvent {
   const LogoutEvent();
 }
+
+class DeleteAccountEvent extends AuthEvent {
+  const DeleteAccountEvent({required this.provider});
+  final String provider;
+}
+
+class DeleteSendOtpEvent extends AuthEvent {
+  const DeleteSendOtpEvent({this.email, this.phone});
+  final String? email;
+  final String? phone;
+}
+
+class DeleteVerifyOtpEvent extends AuthEvent {
+  const DeleteVerifyOtpEvent({required this.code, this.email, this.phone});
+  final String code;
+  final String? email;
+  final String? phone;
+}

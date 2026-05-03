@@ -14,6 +14,7 @@ import '../../domain/usecases/get_me_usecase.dart';
 import '../../domain/usecases/complete_profile_usecase.dart';
 import '../../domain/usecases/edit_profile_usecase.dart';
 import '../../domain/usecases/social_login_usecase.dart';
+import '../../domain/usecases/delete_account_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -29,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required CompleteProfileUseCase completeProfileUseCase,
     required EditProfileUseCase editProfileUseCase,
     required SocialLoginUseCase socialLoginUseCase,
+    required DeleteAccountUseCase deleteAccountUseCase,
     required AuthRepository authRepository,
   })  : _sendOtpUseCase = sendOtpUseCase,
         _verifyOtpUseCase = verifyOtpUseCase,
@@ -39,6 +41,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _completeProfileUseCase = completeProfileUseCase,
         _editProfileUseCase = editProfileUseCase,
         _socialLoginUseCase = socialLoginUseCase,
+        _deleteAccountUseCase = deleteAccountUseCase,
         _authRepository = authRepository,
         super(const AuthInitial()) {
     on<SendOtpEvent>(_onSendOtp);
@@ -51,6 +54,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<CompleteProfileEvent>(_onCompleteProfile);
     on<EditProfileEvent>(_onEditProfile);
     on<LogoutEvent>(_onLogout);
+    on<DeleteAccountEvent>(_onDeleteAccount);
+    on<DeleteSendOtpEvent>(_onDeleteSendOtp);
+    on<DeleteVerifyOtpEvent>(_onDeleteVerifyOtp);
   }
 
   final SendOtpUseCase _sendOtpUseCase;
@@ -62,6 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final CompleteProfileUseCase _completeProfileUseCase;
   final EditProfileUseCase _editProfileUseCase;
   final SocialLoginUseCase _socialLoginUseCase;
+  final DeleteAccountUseCase _deleteAccountUseCase;
   final AuthRepository _authRepository;
 
   // Phone OTP
@@ -144,10 +151,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(const SocialLoginLoading());
     try {
-      final response = await _socialLoginUseCase(provider: event.provider);
+      final result = await _socialLoginUseCase(provider: event.provider);
       emit(SocialLoginSuccess(
-        isNewUser: response.isNewUser,
-        user: response.user,
+        isNewUser: result.response.isNewUser,
+        user: result.response.user,
+        appleDisplayName: result.displayName,
       ));
     } catch (e) {
       final msg = e.toString();
@@ -214,8 +222,79 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     await _authRepository.logout();
-
     emit(const LoggedOut());
+  }
+
+  Future<void> _onDeleteAccount(
+    DeleteAccountEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AccountDeleting());
+    try {
+      switch (event.provider) {
+        case 'google':
+          await _authRepository.reauthWithGoogle();
+          break;
+        case 'apple':
+          await _authRepository.reauthWithApple();
+          break;
+      }
+      await _deleteAccountUseCase();
+      emit(const AccountDeleted());
+    } catch (e) {
+      final msg = e.toString();
+      if (msg.contains('cancelled') || msg.contains('canceled')) {
+        emit(const AuthInitial());
+        return;
+      }
+      emit(AccountDeleteError(message: _parseError(e)));
+    }
+  }
+
+  Future<void> _onDeleteSendOtp(
+    DeleteSendOtpEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AccountDeleting());
+    try {
+      if (event.email != null) {
+        final response =
+            await _authRepository.sendEmailOtp(email: event.email!);
+        emit(DeleteOtpSent(message: response.message));
+      } else {
+        final response =
+            await _authRepository.sendOtp(phone: event.phone!);
+        emit(DeleteOtpSent(message: response.message));
+      }
+    } catch (e) {
+      emit(AccountDeleteError(message: _parseError(e)));
+    }
+  }
+
+  Future<void> _onDeleteVerifyOtp(
+    DeleteVerifyOtpEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AccountDeleting());
+    try {
+      if (event.email != null) {
+        final response = await _authRepository.verifyEmailOtp(
+          email: event.email!,
+          code: event.code,
+        );
+        await _authRepository.signInWithCustomToken(response.customToken);
+      } else {
+        final response = await _authRepository.verifyOtp(
+          phone: event.phone!,
+          code: event.code,
+        );
+        await _authRepository.signInWithCustomToken(response.customToken);
+      }
+      await _deleteAccountUseCase();
+      emit(const AccountDeleted());
+    } catch (e) {
+      emit(AccountDeleteError(message: _parseError(e)));
+    }
   }
 
   String _parseError(Object e) {

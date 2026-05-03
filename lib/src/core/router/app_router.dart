@@ -1,5 +1,6 @@
 import 'package:evim_furniture/src/core/router/pages.dart';
 import 'package:evim_furniture/src/features/auth/presentation/screens/complete_profile_screen.dart';
+import 'package:evim_furniture/src/features/auth/presentation/screens/delete_account_screen.dart';
 import 'package:evim_furniture/src/features/auth/presentation/screens/edit_profile_screen.dart';
 import 'package:evim_furniture/src/features/auth/presentation/screens/login_screen.dart';
 import 'package:evim_furniture/src/features/auth/presentation/screens/otp_screen.dart';
@@ -44,9 +45,20 @@ class AppRouter {
           ),
         );
       case Pages.completeProfile:
-        final initialName = settings.arguments as String?;
+        final args = settings.arguments;
+        String? initialName;
+        bool hideNameField = false;
+        if (args is Map<String, dynamic>) {
+          initialName = args['name'] as String?;
+          hideNameField = args['hideNameField'] as bool? ?? false;
+        } else if (args is String?) {
+          initialName = args;
+        }
         return MaterialPageRoute(
-          builder: (_) => CompleteProfileScreen(initialName: initialName),
+          builder: (_) => CompleteProfileScreen(
+            initialName: initialName,
+            hideNameField: hideNameField,
+          ),
         );
       case Pages.editProfile:
         final user = settings.arguments as UserModel;
@@ -68,6 +80,10 @@ class AppRouter {
       case Pages.serviceTerms:
         return MaterialPageRoute(
             builder: (_) => const ServiceTermsScreen());
+      case Pages.deleteAccount:
+        final user = settings.arguments as UserModel;
+        return MaterialPageRoute(
+            builder: (_) => DeleteAccountScreen(user: user));
       case Pages.categoriesViewAll:
         return MaterialPageRoute(
           builder: (_) => const CategoriesViewAllScreen(),

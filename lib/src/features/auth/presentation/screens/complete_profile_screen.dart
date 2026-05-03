@@ -15,9 +15,14 @@ import '../bloc/auth_bloc.dart';
 enum UserType { mijoz, diller, boshqa }
 
 class CompleteProfileScreen extends StatefulWidget {
-  const CompleteProfileScreen({super.key, this.initialName});
+  const CompleteProfileScreen({
+    super.key,
+    this.initialName,
+    this.hideNameField = false,
+  });
 
   final String? initialName;
+  final bool hideNameField;
 
   @override
   State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
@@ -30,7 +35,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   UserType _selectedType = UserType.mijoz;
   String? _avatarPath;
-  bool _nameError = false;
 
   @override
   void initState() {
@@ -47,8 +51,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     _nameFocus.dispose();
     super.dispose();
   }
-
-  bool get _isValid => _nameController.text.trim().isNotEmpty;
 
   String get _userTypeValue {
     switch (_selectedType) {
@@ -186,14 +188,18 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   void _onComplete() {
-    if (!_isValid) {
-      setState(() => _nameError = true);
-      _nameFocus.requestFocus();
+    final name = _nameController.text.trim();
+    if (!widget.hideNameField && name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppTexts.authNameRequired.tr()),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
       return;
     }
-
     _authBloc.add(CompleteProfileEvent(
-      name: _nameController.text.trim(),
+      name: name,
       userType: _userTypeValue,
       picturePath: _avatarPath,
     ));
@@ -348,82 +354,62 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                       const SizedBox(height: 20),
 
-                      // Name field
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          AppTexts.authNameLabel.tr(),
-                          style: GoogleFonts.dmSans(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: cs.onSurface,
+                      if (!widget.hideNameField) ...[
+                        // Name field
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            AppTexts.authNameLabel.tr(),
+                            style: GoogleFonts.dmSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: cs.onSurface,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      SizedBox(
-                        height: _nameError ? null : 48,
-                        child: TextField(
-                          controller: _nameController,
-                          focusNode: _nameFocus,
-                          textCapitalization: TextCapitalization.words,
-                          onChanged: (_) {
-                            if (_nameError) {
-                              setState(() => _nameError = false);
-                            }
-                          },
-                          style: GoogleFonts.dmSans(fontSize: 14),
-                          decoration: InputDecoration(
-                            hintText: AppTexts.authNameHint.tr(),
-                            hintStyle: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              color: cs.onSurfaceVariant.withOpacity(0.5),
-                            ),
-                            prefixIcon: Icon(
-                              Icons.person_outline_rounded,
-                              size: 20,
-                              color: _nameError
-                                  ? cs.error
-                                  : cs.onSurfaceVariant,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: _nameError
-                                    ? cs.error
-                                    : (isDark
-                                          ? AppColors.darkDivider
-                                          : AppColors.grey200),
+                        const SizedBox(height: 6),
+                        SizedBox(
+                          height: 48,
+                          child: TextField(
+                            controller: _nameController,
+                            focusNode: _nameFocus,
+                            textCapitalization: TextCapitalization.words,
+                            style: GoogleFonts.dmSans(fontSize: 14),
+                            decoration: InputDecoration(
+                              hintText: AppTexts.authNameHint.tr(),
+                              hintStyle: GoogleFonts.dmSans(
+                                fontSize: 14,
+                                color: cs.onSurfaceVariant.withOpacity(0.5),
+                              ),
+                              prefixIcon: Icon(
+                                Icons.person_outline_rounded,
+                                size: 20,
+                                color: cs.onSurfaceVariant,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? AppColors.darkDivider
+                                      : AppColors.grey200,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: cs.primary,
+                                  width: 2,
+                                ),
                               ),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: _nameError ? cs.error : cs.primary,
-                                width: 2,
-                              ),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: cs.error),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: cs.error, width: 2),
-                            ),
-                            errorText: _nameError
-                                ? AppTexts.authNameRequired.tr()
-                                : null,
-                            errorStyle: GoogleFonts.dmSans(fontSize: 11),
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                      ],
 
                       // User type
                       Align(

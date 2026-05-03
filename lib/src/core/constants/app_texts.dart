@@ -138,6 +138,24 @@ class AppTexts {
   static const String authPickGallery = 'authPickGallery';
   static const String authPickRemove = 'authPickRemove';
 
+  // Delete account
+  static const String deleteAccount = 'deleteAccount';
+  static const String deleteAccountTitle = 'deleteAccountTitle';
+  static const String deleteAccountSubtitle = 'deleteAccountSubtitle';
+  static const String deleteAccountConfirm = 'deleteAccountConfirm';
+  static const String deleteAccountConfirmDesc = 'deleteAccountConfirmDesc';
+  static const String deleteAccountBtn = 'deleteAccountBtn';
+  static const String deleteAccountItem1 = 'deleteAccountItem1';
+  static const String deleteAccountItem2 = 'deleteAccountItem2';
+  static const String deleteAccountItem3 = 'deleteAccountItem3';
+  static const String deleteAccountItem4 = 'deleteAccountItem4';
+  static const String deleteAccountItem5 = 'deleteAccountItem5';
+  static const String deleteReauthTitle = 'deleteReauthTitle';
+  static const String deleteReauthGoogle = 'deleteReauthGoogle';
+  static const String deleteReauthApple = 'deleteReauthApple';
+  static const String deleteReauthOtp = 'deleteReauthOtp';
+  static const String deleteSuccess = 'deleteSuccess';
+
   // Time formatting
   static const String timeNow = 'timeNow';
   static const String timeMinutesAgo = 'timeMinutesAgo';

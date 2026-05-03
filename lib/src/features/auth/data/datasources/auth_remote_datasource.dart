@@ -34,6 +34,9 @@ abstract class AuthRemoteDataSource {
 
   // User
   Future<UserModel> getMe();
+
+  // Account
+  Future<void> deleteAccount({String? freshToken});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -147,5 +150,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final res = await dioClient.dio.get('/api/auth/me');
     final data = res.data as Map<String, dynamic>;
     return UserModel.fromJson(data['data'] as Map<String, dynamic>);
+  }
+
+  // Account
+  @override
+  Future<void> deleteAccount({String? freshToken}) async {
+    await dioClient.dio.delete(
+      '/api/auth/account',
+      data: {'confirmation': 'DELETE'},
+      options: freshToken != null
+          ? Options(headers: {'Authorization': 'Bearer $freshToken'})
+          : null,
+    );
   }
 }

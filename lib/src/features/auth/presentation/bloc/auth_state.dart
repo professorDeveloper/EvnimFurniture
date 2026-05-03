@@ -64,9 +64,11 @@ class SocialLoginSuccess extends AuthState {
   const SocialLoginSuccess({
     required this.isNewUser,
     required this.user,
+    this.appleDisplayName,
   });
   final bool isNewUser;
   final UserModel user;
+  final String? appleDisplayName;
 }
 
 class SocialLoginError extends AuthState {
@@ -106,4 +108,22 @@ class ProfileSaveError extends AuthState {
 
 class LoggedOut extends AuthState {
   const LoggedOut();
+}
+
+class DeleteOtpSent extends AuthState {
+  const DeleteOtpSent({required this.message});
+  final String message;
+}
+
+class AccountDeleting extends AuthState {
+  const AccountDeleting();
+}
+
+class AccountDeleted extends AuthState {
+  const AccountDeleted();
+}
+
+class AccountDeleteError extends AuthState {
+  const AccountDeleteError({required this.message});
+  final String message;
 }

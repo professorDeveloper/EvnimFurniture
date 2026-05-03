@@ -80,7 +80,16 @@ class AuthRepositoryImpl implements AuthRepository {
       idToken: appleCredential.identityToken,
       accessToken: appleCredential.authorizationCode,
     );
-    return firebaseAuth.signInWithCredential(credential);
+    final userCred = await firebaseAuth.signInWithCredential(credential);
+    final appleDisplayName = [appleCredential.givenName, appleCredential.familyName]
+        .where((e) => e != null && e.isNotEmpty)
+        .join(' ');
+    if (appleDisplayName.isNotEmpty &&
+        (userCred.user?.displayName == null || userCred.user!.displayName!.isEmpty)) {
+      await userCred.user?.updateDisplayName(appleDisplayName);
+      await userCred.user?.reload();
+    }
+    return userCred;
   }
 
   @override
@@ -106,4 +115,43 @@ class AuthRepositoryImpl implements AuthRepository {
   // User
   @override
   Future<UserModel> getMe() => remoteDataSource.getMe();
+
+  // Account
+  @override
+  Future<void> reauthWithGoogle() async {
+    final googleSignIn = GoogleSignIn.instance;
+    await googleSignIn.initialize();
+    final googleUser = await googleSignIn.authenticate();
+    final idToken = googleUser.authentication.idToken;
+    if (idToken == null) throw Exception('Google sign-in failed');
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
+    await firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+  }
+
+  @override
+  Future<void> reauthWithApple() async {
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [AppleIDAuthorizationScopes.email],
+    );
+    final credential = OAuthProvider('apple.com').credential(
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
+    );
+    await firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final freshToken = await firebaseAuth.currentUser?.getIdToken(true);
+    await remoteDataSource.deleteAccount(freshToken: freshToken);
+    try {
+      await firebaseAuth.currentUser?.delete();
+    } catch (_) {}
+    await firebaseAuth.signOut();
+    try {
+      final googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.initialize();
+      await googleSignIn.disconnect();
+    } catch (_) {}
+  }
 }

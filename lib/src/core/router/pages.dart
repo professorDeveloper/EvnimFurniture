@@ -16,4 +16,5 @@ class Pages {
   static const String legalInfo = '/legal-info';
   static const String privacyPolicy = '/privacy-policy';
   static const String serviceTerms = '/service-terms';
+  static const String deleteAccount = '/delete-account';
 }

@@ -6,9 +6,9 @@ import 'package:evim_furniture/src/core/constants/app_texts.dart';
 import 'package:evim_furniture/src/core/di/injection.dart';
 import 'package:evim_furniture/src/core/router/pages.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pinput/pinput.dart';
 
 import '../bloc/auth_bloc.dart';
 
@@ -31,14 +31,8 @@ class _OtpScreenState extends State<OtpScreen> {
   static const int _maxResend = 5;
   static const int _timerSeconds = 60;
 
-  final List<TextEditingController> _controllers = List.generate(
-    _codeLength,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(
-    _codeLength,
-    (_) => FocusNode(),
-  );
+  final _pinController = TextEditingController();
+  final _focusNode = FocusNode();
 
   late AuthBloc _authBloc;
 
@@ -56,19 +50,15 @@ class _OtpScreenState extends State<OtpScreen> {
     _authBloc = sl<AuthBloc>();
     _startCountdown();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNodes[0].requestFocus();
+      _focusNode.requestFocus();
     });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    for (final c in _controllers) {
-      c.dispose();
-    }
-    for (final f in _focusNodes) {
-      f.dispose();
-    }
+    _pinController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -89,33 +79,11 @@ class _OtpScreenState extends State<OtpScreen> {
     setState(() => _resendCount++);
     _authBloc.add(ResendOtpEvent(phone: widget.destination));
     _startCountdown();
-    for (final c in _controllers) {
-      c.clear();
-    }
-    _focusNodes[0].requestFocus();
+    _pinController.clear();
+    _focusNode.requestFocus();
   }
 
-  void _onCodeChanged(int index, String value) {
-    if (value.length == 1 && index < _codeLength - 1) {
-      _focusNodes[index + 1].requestFocus();
-    }
-    final code = _controllers.map((c) => c.text).join();
-    if (code.length == _codeLength) {
-      _verifyCode(code);
-    }
-  }
-
-  void _onKeyDown(int index, KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.backspace &&
-        _controllers[index].text.isEmpty &&
-        index > 0) {
-      _controllers[index - 1].clear();
-      _focusNodes[index - 1].requestFocus();
-    }
-  }
-
-  void _verifyCode(String code) {
+  void _onCompleted(String code) {
     if (_isPhone) {
       _authBloc.add(VerifyOtpEvent(phone: widget.destination, code: code));
     } else {
@@ -143,6 +111,40 @@ class _OtpScreenState extends State<OtpScreen> {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final defaultPinTheme = PinTheme(
+      width: 56,
+      height: 56,
+      textStyle: GoogleFonts.dmSans(
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        color: cs.onSurface,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceVariant : AppColors.grey50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.darkDivider : AppColors.grey200,
+          width: 1.5,
+        ),
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        border: Border.all(color: cs.primary, width: 2),
+      ),
+    );
+
+    final submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: defaultPinTheme.decoration?.copyWith(
+        border: Border.all(
+          color: (isDark ? AppColors.secondary200 : AppColors.secondary)
+              .withValues(alpha: 0.4),
+          width: 1.5,
+        ),
+      ),
+    );
+
     return BlocProvider(
       create: (_) => _authBloc,
       child: BlocListener<AuthBloc, AuthState>(
@@ -158,11 +160,8 @@ class _OtpScreenState extends State<OtpScreen> {
               );
             }
           } else if (state is OtpVerifyError) {
-            // Clear OTP fields on error
-            for (final c in _controllers) {
-              c.clear();
-            }
-            _focusNodes[0].requestFocus();
+            _pinController.clear();
+            _focusNode.requestFocus();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -216,7 +215,6 @@ class _OtpScreenState extends State<OtpScreen> {
                 children: [
                   const SizedBox(height: 20),
 
-                  // Subtitle + destination
                   Align(
                     alignment: Alignment.centerLeft,
                     child: RichText(
@@ -243,34 +241,21 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // OTP Fields
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(_codeLength, (i) {
-                        return Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              left: i == 0 ? 0 : 5,
-                              right: i == _codeLength - 1 ? 0 : 5,
-                            ),
-                            child: _OtpField(
-                              controller: _controllers[i],
-                              focusNode: _focusNodes[i],
-                              isDark: isDark,
-                              onChanged: (v) => _onCodeChanged(i, v),
-                              onKeyEvent: (e) => _onKeyDown(i, e),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
+                  Pinput(
+                    length: _codeLength,
+                    controller: _pinController,
+                    focusNode: _focusNode,
+                    defaultPinTheme: defaultPinTheme,
+                    focusedPinTheme: focusedPinTheme,
+                    submittedPinTheme: submittedPinTheme,
+                    keyboardType: TextInputType.number,
+                    onCompleted: _onCompleted,
+                    closeKeyboardWhenCompleted: false,
+                    hapticFeedbackType: HapticFeedbackType.lightImpact,
                   ),
 
                   const SizedBox(height: 24),
 
-                  // Timer + Resend
                   if (_isPhone)
                     Column(
                       children: [
@@ -338,7 +323,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               style: GoogleFonts.dmSans(
                                 fontSize: 12,
                                 color:
-                                    cs.onSurfaceVariant.withOpacity(0.6),
+                                    cs.onSurfaceVariant.withValues(alpha: 0.6),
                               ),
                             ),
                           ),
@@ -350,7 +335,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? AppColors.secondary800.withOpacity(0.3)
+                            ? AppColors.secondary800.withValues(alpha: 0.3)
                             : AppColors.secondary50,
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -382,16 +367,14 @@ class _OtpScreenState extends State<OtpScreen> {
 
                   const SizedBox(height: 16),
 
-                  // Security note
                   Text(
                     AppTexts.authOtpSecure.tr(),
                     style: GoogleFonts.dmSans(
                       fontSize: 11,
-                      color: cs.onSurfaceVariant.withOpacity(0.45),
+                      color: cs.onSurfaceVariant.withValues(alpha: 0.45),
                     ),
                   ),
 
-                  // Verify loading
                   BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, state) {
                       if (state is OtpVerifying) {
@@ -412,102 +395,6 @@ class _OtpScreenState extends State<OtpScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OtpField extends StatefulWidget {
-  const _OtpField({
-    required this.controller,
-    required this.focusNode,
-    required this.isDark,
-    required this.onChanged,
-    required this.onKeyEvent,
-  });
-
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool isDark;
-  final ValueChanged<String> onChanged;
-  final ValueChanged<KeyEvent> onKeyEvent;
-
-  @override
-  State<_OtpField> createState() => _OtpFieldState();
-}
-
-class _OtpFieldState extends State<_OtpField> {
-  bool _hasFocus = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.focusNode.addListener(_onFocusChange);
-  }
-
-  @override
-  void dispose() {
-    widget.focusNode.removeListener(_onFocusChange);
-    super.dispose();
-  }
-
-  void _onFocusChange() {
-    setState(() => _hasFocus = widget.focusNode.hasFocus);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final hasValue = widget.controller.text.isNotEmpty;
-
-    return KeyboardListener(
-      focusNode: FocusNode(),
-      onKeyEvent: widget.onKeyEvent,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        height: 56,
-        decoration: BoxDecoration(
-          color:
-              widget.isDark ? AppColors.darkSurfaceVariant : AppColors.grey50,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _hasFocus
-                ? cs.primary
-                : hasValue
-                    ? (widget.isDark
-                            ? AppColors.secondary200
-                            : AppColors.secondary)
-                        .withOpacity(0.4)
-                    : (widget.isDark
-                        ? AppColors.darkDivider
-                        : AppColors.grey200),
-            width: _hasFocus ? 2 : 1.5,
-          ),
-        ),
-        child: Center(
-          child: TextField(
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            onChanged: widget.onChanged,
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            maxLength: 1,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: GoogleFonts.dmSans(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: cs.onSurface,
-            ),
-            decoration: const InputDecoration(
-              counterText: '',
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-              filled: false,
             ),
           ),
         ),

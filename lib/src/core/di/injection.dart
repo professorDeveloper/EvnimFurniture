@@ -44,6 +44,7 @@ import '../../features/auth/domain/usecases/get_me_usecase.dart';
 import '../../features/auth/domain/usecases/complete_profile_usecase.dart';
 import '../../features/auth/domain/usecases/edit_profile_usecase.dart';
 import '../../features/auth/domain/usecases/social_login_usecase.dart';
+import '../../features/auth/domain/usecases/delete_account_usecase.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 
 import '../../features/category/data/datasources/category_remote_datasource.dart';
@@ -162,6 +163,7 @@ Future<void> setupDi() async {
   sl.registerLazySingleton(() => CompleteProfileUseCase(sl()));
   sl.registerLazySingleton(() => EditProfileUseCase(sl()));
   sl.registerLazySingleton(() => SocialLoginUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteAccountUseCase(sl()));
 
   sl.registerFactory(() => AuthBloc(
         sendOtpUseCase: sl(),
@@ -173,6 +175,7 @@ Future<void> setupDi() async {
         completeProfileUseCase: sl(),
         editProfileUseCase: sl(),
         socialLoginUseCase: sl(),
+        deleteAccountUseCase: sl(),
         authRepository: sl(),
       ));
 

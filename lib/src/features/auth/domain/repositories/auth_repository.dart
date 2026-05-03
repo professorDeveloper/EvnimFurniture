@@ -39,4 +39,9 @@ abstract class AuthRepository {
 
   // User
   Future<UserModel> getMe();
+
+  // Account
+  Future<void> reauthWithGoogle();
+  Future<void> reauthWithApple();
+  Future<void> deleteAccount();
 }

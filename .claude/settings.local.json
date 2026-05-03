@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(flutter pub *)",
-      "Bash(python -c \"from PIL import Image; print\\('pillow ok'\\)\")"
+      "Bash(python -c \"from PIL import Image; print\\('pillow ok'\\)\")",
+      "Bash(flutter analyze:*)",
+      "Read(//Users/saikou/Desktop/**)",
+      "Bash(ffmpeg -i ~/Desktop/appstore_delete_account.MP4)",
+      "Bash(mkdir -p /tmp/video_frames)",
+      "Bash(ffmpeg -i ~/Desktop/appstore_delete_account.MP4 -vf \"fps=1/5\" -q:v 2 /tmp/video_frames/frame_%03d.jpg -y)"
     ]
   }
 }
